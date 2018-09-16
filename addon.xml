@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="plugin.video.catchuptvandmoretestdrmkodi18"
        name="Catch-up TV &amp; More Test DRM Kodi 18"
-       version="0.0.01~beta01"
+       version="0.0.01~beta02"
        provider-name="SylvainCcchetto,wwark">
   <requires>
     <import addon="xbmc.python" version="2.25.0"/>
@@ -32,7 +32,8 @@
     <source>https://github.com/Catch-up-TV-and-More/plugin.video.catchuptvandmoretestdrmkodi18</source>
     <news>
 [Version 0.0.01]
-[DRM] First work on live Canal+ (wwark and work of Psykk) - Not working
+[DRM] Replay with DRM capabilites for Group M6 (wwark and thanks peak3d)
+[Add/Remove Channels] Add RTL 2 / Remove Bruce, Crazy Kitchen, Home Time, Sixième Style (wwark)
     </news>
     <assets>
       <icon>icon.png</icon>

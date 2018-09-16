@@ -34,36 +34,21 @@ SKELETON = {
         ('live_tv', 'generic_menu'): {
 
             ('fr', 'build_live_tv_menu'): [
-                ('canalplus', 'none'),
-                ('c8', 'none'),
-                ('cstar', 'none'),
-                ('infosportplus', '')
             ]
         },
 
         ('replay', 'generic_menu'): {
 
             ('fr', 'generic_menu'): [
-                # ('canalplus', 'replay_entry'),
-                # ('c8', 'replay_entry'),
-                # ('cstar', 'replay_entry'),
-                # ('seasons', 'replay_entry'),
-                # ('comedie', 'replay_entry'),
-                # ('les-chaines-planete', 'replay_entry'),
-                # ('golfplus', 'replay_entry'),
-                # ('cineplus', 'replay_entry'),
-                # ('infosportplus', 'replay_entry'),
-                # ('polar-plus', 'replay_entry'),
-                # ('m6', 'replay_entry'),
-                # ('w9', 'replay_entry'),
-                # ('6ter', 'replay_entry'),
-                # ('stories', 'replay_entry'),
-                # ('bruce', 'replay_entry'),
-                # ('crazy_kitchen', 'replay_entry'),
-                # ('home', 'replay_entry'),
-                # ('styles', 'replay_entry'),
-                # ('comedy', 'replay_entry'),
-                # ('fun_radio', 'replay_entry')
+                ('m6', 'replay_entry'),
+                ('w9', 'replay_entry'),
+                ('6ter', 'replay_entry'),
+                ('stories', 'replay_entry'),
+                ('comedy', 'replay_entry'),
+                ('fun_radio', 'replay_entry'),
+                ('rtl2', 'replay_entry'),
+                ('teva', 'replay_entry'),
+                ('parispremiere', 'replay_entry')
             ]
 
         },
@@ -89,26 +74,15 @@ CHANNELS dictionary is the bridge between
 the channel name and his corresponding python file
 '''
 CHANNELS = {
-    'canalplus': 'mycanal',
-    'c8': 'mycanal',
-    'cstar': 'mycanal',
-    'seasons': 'mycanal',
-    'comedie': 'mycanal',
-    'les-chaines-planete': 'mycanal',
-    'golfplus': 'mycanal',
-    'cineplus': 'mycanal',
-    'infosportplus': 'mycanal',
-    'polar-plus': 'mycanal',
     'm6': '6play',
     'w9': '6play',
     '6ter': '6play',
     'stories': '6play',
-    'bruce': '6play',
-    'crazy_kitchen': '6play',
-    'home': '6play',
-    'styles': '6play',
     'comedy': '6play',
-    'fun_radio': '6play'
+    'fun_radio': '6play',
+    'rtl2': '6play',
+    'teva': '6play',
+    'parispremiere': '6play'
 }
 
 '''
@@ -125,26 +99,15 @@ LABELS = {
     'fr': 'France',
 
     # French channels / live TV
-    'canalplus': 'Canal +',
-    'c8': 'C8',
-    'cstar': 'CStar',
-    'seasons': 'Seasons',
-    'comedie': 'Comédie +',
-    'les-chaines-planete': 'Les chaînes planètes +',
-    'golfplus': 'Golf +',
-    'cineplus': 'Ciné +',
-    'infosportplus': 'INFOSPORT+',
-    'polar-plus': 'Polar+',
     'stories': 'Stories (6play)',
-    'bruce': 'Bruce (6play)',
-    'crazy_kitchen': 'Crazy Kitchen (6play)',
-    'home': 'Home Time (6play)',
-    'styles': 'Sixième Style (6play)',
     'comedy': 'Comic (6play)',
     'm6': 'M6',
     'w9': 'W9',
     '6ter': '6ter',
-    'fun_radio': 'Fun Radio'
+    'fun_radio': 'Fun Radio',
+    'rtl2': 'RTL 2',
+    'teva': 'Teva',
+    'parispremiere': 'Paris Première'
 
 
 }

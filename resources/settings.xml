@@ -43,66 +43,32 @@
         <setting label="30080" type="lsep" subsetting="true" visible="eq(1,true)"/>
         <setting label="" type="bool" id="fr" default="true" visible="false"/>
 
-            <setting label="Canal +" type="bool" id="canalplus" default="true" visible="eq(-7,true)"/>
-            <setting label="" type="number" visible="false" id="canalplus.order" default="4"/>
+            <setting label="M6" type="bool" id="m6" default="true" visible="eq(-1,true)"/>
+            <setting label="" type="number" visible="false" id="m6.order" default="1"/>
 
-            <setting label="M6" type="bool" id="m6" default="true" visible="eq(-11,true)"/>
-            <setting label="" type="number" visible="false" id="m6.order" default="6"/>
+            <setting label="W9" type="bool" id="w9" default="true" visible="eq(-3,true)"/>
+            <setting label="" type="number" visible="false" id="w9.order" default="2"/>
 
-            <setting label="C8" type="bool" id="c8" default="true" visible="eq(-13,true)"/>
-            <setting label="" type="number" visible="false" id="c8.order" default="7"/>
+            <setting label="6ter" type="bool" id="6ter" default="true" visible="eq(-5,true)"/>
+            <setting label="" type="number" visible="false" id="6ter.order" default="3"/>
 
-            <setting label="W9" type="bool" id="w9" default="true" visible="eq(-15,true)"/>
-            <setting label="" type="number" visible="false" id="w9.order" default="8"/>
+            <setting label="Stories (6play)" type="bool" id="stories" default="true" visible="eq(-7,true)"/>
+            <setting label="" type="number" visible="false" id="stories.order" default="4"/>
 
-            <setting label="CStar" type="bool" id="cstar" default="true" visible="eq(-29,true)"/>
-            <setting label="" type="number" visible="false" id="cstar.order" default="15"/>
+            <setting label="Comic (6play)" type="bool" id="comedy" default="true" visible="eq(-9,true)"/>
+            <setting label="" type="number" visible="false" id="comedy.order" default="5"/>
 
-            <setting label="6ter" type="bool" id="6ter" default="true" visible="eq(-39,true)"/>
-            <setting label="" type="number" visible="false" id="6ter.order" default="20"/>
+            <setting label="Fun Radio" type="bool" id="fun_radio" default="true" visible="eq(-11,true)"/>
+            <setting label="" type="number" visible="false" id="fun_radio.order" default="6"/>
 
-            <setting label="Stories (6play)" type="bool" id="stories" default="true" visible="eq(-65,true)"/>
-            <setting label="" type="number" visible="false" id="stories.order" default="33"/>
+            <setting label="RTL 2" type="bool" id="rtl2" default="true" visible="eq(-13,true)"/>
+            <setting label="" type="number" visible="false" id="rtl2.order" default="7"/>
 
-            <setting label="Bruce (6play)" type="bool" id="bruce" default="true" visible="eq(-67,true)"/>
-            <setting label="" type="number" visible="false" id="bruce.order" default="34"/>
+            <setting label="Teva" type="bool" id="teva" default="true" visible="eq(-15,true)"/>
+            <setting label="" type="number" visible="false" id="teva.order" default="8"/>
 
-            <setting label="Crazy Kitchen (6play)" type="bool" id="crazy_kitchen" default="true" visible="eq(-69,true)"/>
-            <setting label="" type="number" visible="false" id="crazy_kitchen.order" default="35"/>
-
-            <setting label="Home Time (6play)" type="bool" id="home" default="true" visible="eq(-71,true)"/>
-            <setting label="" type="number" visible="false" id="home.order" default="36"/>
-
-            <setting label="Sixième Style (6play)" type="bool" id="styles" default="true" visible="eq(-73,true)"/>
-            <setting label="" type="number" visible="false" id="styles.order" default="37"/>
-
-            <setting label="Comic (6play)" type="bool" id="comedy" default="true" visible="eq(-75,true)"/>
-            <setting label="" type="number" visible="false" id="comedy.order" default="38"/>
-
-            <setting label="Seasons" type="bool" id="seasons" default="true" visible="eq(-93,true)"/>
-            <setting label="" type="number" visible="false" id="seasons.order" default="47"/>
-
-            <setting label="Comédie +" type="bool" id="comedie" default="true" visible="eq(-95,true)"/>
-            <setting label="" type="number" visible="false" id="comedie.order" default="48"/>
-
-            <setting label="Les chaînes planètes +" type="bool" id="les-chaines-planete" default="true" visible="eq(-97,true)"/>
-            <setting label="" type="number" visible="false" id="les-chaines-planete.order" default="49"/>
-
-            <setting label="Golf +" type="bool" id="golfplus" default="true" visible="eq(-99,true)"/>
-            <setting label="" type="number" visible="false" id="golfplus.order" default="50"/>
-
-            <setting label="Ciné +" type="bool" id="cineplus" default="true" visible="eq(-101,true)"/>
-            <setting label="" type="number" visible="false" id="cineplus.order" default="51"/>
-
-            <setting label="INFOSPORT+" type="bool" id="infosportplus" default="true" visible="eq(-103,true)"/>
-            <setting label="" type="number" visible="false" id="infosportplus.order" default="52"/>
-
-            <setting label="Fun Radio" type="bool" id="fun_radio" default="true" visible="eq(-115,true)"/>
-            <setting label="" type="number" visible="false" id="fun_radio.order" default="58"/>
-
-            <setting label="Polar+" type="bool" id="polar-plus" default="true" visible="eq(-121,true)"/>
-            <setting label="" type="number" visible="false" id="polar-plus.order" default="61"/>
-
+            <setting label="Paris Première" type="bool" id="parispremiere" default="true" visible="eq(-17,true)"/>
+            <setting label="" type="number" visible="false" id="parispremiere.order" default="9"/>
         <!-- France -->
 
     </category>
@@ -156,6 +122,11 @@
     <!-- Accounts -->
     <category label="30004">
 
+        <setting label="30080" type="lsep" subsetting="true" visible="eq(1,true)"/>
+        <setting label="" type="bool" id="fr" default="true" visible="false"/>
+
+            <setting label="30244" type="text" id="6play.login" visible="eq(-1,true)" defaut=""/>
+            <setting label="30245" type="text" id="6play.password" option="hidden" visible="eq(-2,true)" defaut=""/>
 
     </category>
     <!-- Accounts -->

@@ -281,6 +281,13 @@ msgctxt "#30243"
 msgid "VRT NU Password"
 msgstr ""
 
+msgctxt "#30244"
+msgid "6play Login"
+msgstr ""
+
+msgctxt "#30245"
+msgid "6play Password"
+msgstr ""
 
 # Reserved space for other tab/category in settins (from 30260 to 30339)
 
@@ -469,7 +476,7 @@ msgid "Authentication failed"
 msgstr ""
 
 msgctxt "#30712"
-msgid "Video with an account needed"
+msgid "Paid video"
 msgstr ""
 
 msgctxt "#30713"

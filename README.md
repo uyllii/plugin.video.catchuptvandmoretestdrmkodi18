@@ -1,5 +1,5 @@
 # Catch-up TV & More Test DRM Kodi 18
-![Catch-up TV & More Test DRM Kodi 18](https://github.com/SylvainCecchetto/plugin.video.catchuptvandmoretestdrmkodi18/raw/master/icon.png)
+![Catch-up TV & More Test DRM Kodi 18](https://github.com/Catch-up-TV-and-More/plugin.video.catchuptvandmoretestdrmkodi18/blob/master/icon.png)
 
 ## Descritpion
 Catch-Up TV & More Test DRM Kodi 18 est un plugin vidéo pour le media center Kodi (ex XBMC).
@@ -11,7 +11,17 @@ Cette extension regroupe l'ensemble des vidéos des différents services et cha�
 ## Chaînes disponibles — *Available channels*
 ### France
 ##### TV
-TODO
+- M6 *(Replay) (DRM capabilities) (6play account required)*
+- W9 *(Replay) (DRM capabilities) (6play account required)*
+- 6ter *(Replay) (DRM capabilities) (6play account required)*
+- Fun Radio *(Replay) (DRM capabilities) (6play account required)*
+- RTL 2 *(Replay) (DRM capabilities) (6play account required)*
+- Teva *(Replay) (DRM capabilities) (6play account required) (Paid video - purchase monthly)*
+- Paris Première *(Replay) (DRM capabilities) (6play account required) (Paid video - purchase monthly)*
+
+##### Web TV
+- Stories — 6play *(Replay) (DRM capabilities) (6play account required)*
+- Comic — 6play *(Replay) (DRM capabilities) (6play account required)*
 
 ## Sites internet disponibles — *Available Websites*
 

@@ -23,14 +23,19 @@
 
 
 import json
+import re
 from resources.lib import utils
 from resources.lib import common
 
 # TO DO
 # LIVE TV protected by #EXT-X-FAXS-CM
-# https://helpx.adobe.com/adobe-media-server/dev/configuring-content-protection-hls.html
 # Playlists (cas les blagues de TOTO)
 # Get vtt subtitle
+# Some videos not MDP (find )
+# Rework the code (ask sy6sy2)
+# Some DRM (m3u8) not working old videos (Kamelot)
+
+# Thank you (https://github.com/peak3d/plugin.video.simple)
 
 
 # Url to get channel's categories
@@ -74,6 +79,19 @@ URL_JSON_VIDEO = 'https://pc.middleware.6play.fr/6play/v2/platforms/' \
 URL_IMG = 'https://images.6play.fr/v1/images/%s/raw'
 
 
+URL_COMPTE_LOGIN = 'https://login.6play.fr/accounts.login'
+# https://login.6play.fr/accounts.login?loginID=*****&password=*******&targetEnv=mobile&format=jsonp&apiKey=3_hH5KBv25qZTd_sURpixbQW6a4OsiIzIEF2Ei_2H7TXTGLJb_1Hr4THKZianCQhWK&callback=jsonp_3bbusffr388pem4
+# TODO get value Callback
+# callback: jsonp_3bbusffr388pem4
+
+URL_API_KEY = 'https://www.6play.fr/client-37978e84c0.bundle.js'
+# https://www.6play.fr/connexion (js above (TODO))
+
+URL_TOKEN_DRM = 'https://6play-users.6play.fr/v2/platforms/m6group_web/services/6play/users/%s/videos/%s/upfront-token'
+
+URL_LICENCE_KEY = 'https://lic.drmtoday.com/license-proxy-widevine/cenc/|Content-Type=&User-Agent=Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3041.0 Safari/537.36&Host=lic.drmtoday.com&x-dt-auth-token=%s|R{SSM}|JBlicense'
+# Token
+
 def channel_entry(params):
     """Entry function of the module"""
     if 'replay_entry' == params.next:
@@ -97,11 +115,8 @@ def list_shows(params):
 
         url_root_site = ''
         if params.channel_name == 'stories' or \
-                params.channel_name == 'bruce' or \
-                params.channel_name == 'crazy_kitchen' or \
-                params.channel_name == 'home' or \
-                params.channel_name == 'styles' or \
                 params.channel_name == 'comedy' or \
+                params.channel_name == 'rtl2' or \
                 params.channel_name == 'fun_radio':
             url_root_site = URL_ROOT % params.channel_name
         else:
@@ -275,6 +290,38 @@ def list_videos(params):
 
     # TO DO Playlist More one 'clips'
 
+
+    result = utils.get_webcontent(URL_API_KEY)
+
+    api_key = re.compile(
+            r'\"login.6play.fr\"\,key\:\"(.*?)\"'
+        ).findall(result)[0]
+
+    module_name = eval(params.module_path)[-1]
+
+    # Build PAYLOAD
+    payload = {
+        "loginID": common.PLUGIN.get_setting(
+            module_name + '.login'),
+        "password": common.PLUGIN.get_setting(
+            module_name + '.password'),
+        "apiKey": api_key,
+        "format": "jsonp",
+        "callback": "jsonp_3bbusffr388pem4"
+    }
+
+    # LOGIN
+    result_2_json = utils.get_webcontent(
+        URL_COMPTE_LOGIN, request_type='post', post_dic=payload, specific_headers={'referer':'https://www.6play.fr/connexion'})
+    result_2_jsonparser = json.loads(result_2_json.replace('jsonp_3bbusffr388pem4(', '').replace(');',''))
+    if "UID" not in result_2_jsonparser:
+        utils.send_notification(
+            params.channel_name + ' : ' + common.ADDON.get_localized_string(30711))
+        return None
+    account_id = result_2_jsonparser["UID"]
+    account_timestamp = result_2_jsonparser["signatureTimestamp"]
+    account_signature = result_2_jsonparser["UIDSignature"]
+
     for video in json_parser:
         video_id = str(video['id'])
 
@@ -329,20 +376,74 @@ def list_videos(params):
         context_menu = []
         context_menu.append(download_video)
 
-        videos.append({
-            'label': title,
-            'thumb': program_img,
-            'url': common.PLUGIN.get_url(
-                module_path=params.module_path,
-                module_name=params.module_name,
-                action='replay_entry',
-                next='play',
-                video_id=video_id,
-            ),
-            'is_playable': True,
-            'info': info,
-            'context_menu': context_menu
-        })
+        is_drm = False
+        all_datas_videos_path = []
+        if video['clips'][0]['assets'] is not None:
+            for asset in video['clips'][0]['assets']:
+                if 'http_h264' in asset["type"]:
+                    all_datas_videos_path.append(
+                        asset['full_physical_path'].encode('utf-8'))
+                    break
+                elif 'h264' in asset["type"]:
+                    manifest = utils.get_webcontent(
+                        asset['full_physical_path'].encode('utf-8'),
+                            random_ua=True)
+                    if 'drm' not in manifest:
+                        all_datas_videos_path.append(
+                            asset['full_physical_path'].encode('utf-8'))
+                        break
+
+        if len(all_datas_videos_path) == 0:
+            is_drm = True
+
+        if is_drm:
+            # Build PAYLOAD headers
+            payload_headers = {
+                'x-auth-gigya-signature': account_signature,
+                'x-auth-gigya-signature-timestamp': account_timestamp,
+                'x-auth-gigya-uid': account_id,
+            }
+            token_json = utils.get_webcontent(
+                URL_TOKEN_DRM % (account_id, video_id), specific_headers=payload_headers)
+            token_jsonparser = json.loads(token_json)
+            token = token_jsonparser["token"]
+
+            videos.append({
+                'label': title,
+                'thumb': program_img,
+                'url': common.PLUGIN.get_url(
+                    module_path=params.module_path,
+                    module_name=params.module_name,
+                    action='replay_entry',
+                    next='play',
+                    video_id=video_id,
+                ),
+                'is_playable': True,
+                'info': info,
+                'properties': {
+                    'inputstreamaddon': 'inputstream.adaptive',
+                    'inputstream.adaptive.manifest_type': 'mpd',
+                    'inputstream.adaptive.license_type': 'com.widevine.alpha',
+                    'inputstream.adaptive.license_key': URL_LICENCE_KEY % token
+                },
+                'context_menu': context_menu
+            })
+
+        else:
+            videos.append({
+                'label': title,
+                'thumb': program_img,
+                'url': common.PLUGIN.get_url(
+                    module_path=params.module_path,
+                    module_name=params.module_name,
+                    action='replay_entry',
+                    next='play',
+                    video_id=video_id,
+                ),
+                'is_playable': True,
+                'info': info,
+                'context_menu': context_menu
+            })
 
     return common.PLUGIN.create_listing(
         videos,
@@ -377,43 +478,25 @@ def get_video_url(params):
     # "type":"http_h264" => Video not proted by DRM (mp4) (Quality SD "video_quality":"sd", HD "video_quality":"hq", HD "video_quality":"hd", HD "video_quality":"lq", 3G) 
     # "type":"http_subtitle_vtt_sm" => Subtitle (in English TVShows)
 
-    desired_quality = common.PLUGIN.get_setting('quality')
-    all_datas_videos_quality = []
+    # desired_quality = common.PLUGIN.get_setting('quality')
+    url_stream = ''
+
     all_datas_videos_path = []
     for asset in video_assets:
         if 'http_h264' in asset["type"]:
-            all_datas_videos_quality.append(asset["video_quality"])
             all_datas_videos_path.append(
                 asset['full_physical_path'].encode('utf-8'))
         elif 'h264' in asset["type"]:
             manifest = utils.get_webcontent(
                 asset['full_physical_path'].encode('utf-8'),
-                random_ua=True)
+                    random_ua=True)
             if 'drm' not in manifest:
-                all_datas_videos_quality.append(asset["video_quality"])
                 all_datas_videos_path.append(
                     asset['full_physical_path'].encode('utf-8'))
-
-    if len(all_datas_videos_quality) == 0:
-        utils.send_notification(common.ADDON.get_localized_string(30702))
-        return ''
-    elif len(all_datas_videos_quality) == 1:
-        return all_datas_videos_path[0]
+    if len(all_datas_videos_path) > 0:
+        url_stream = all_datas_videos_path[0]
     else:
-        if desired_quality == "DIALOG":
-            seleted_item = common.sp.xbmcgui.Dialog().select(
-                common.GETTEXT('Choose video quality'),
-                all_datas_videos_quality)
-            if seleted_item == -1:
-                return ''
-            return all_datas_videos_path[seleted_item]
-        elif desired_quality == "BEST":
-            url_best = ''
-            i = 0
-            for data_video in all_datas_videos_quality:
-                if 'lq' not in data_video:
-                    url_best = all_datas_videos_path[i]
-                i = i + 1
-            return url_best
-        else:
-            return all_datas_videos_path[0]
+        for asset in video_assets:
+            if 'usp_dashcenc_h264' in asset["type"]:
+                url_stream = asset['full_physical_path'].encode('utf-8')
+    return url_stream
