@@ -84,8 +84,10 @@ URL_COMPTE_LOGIN = 'https://login.6play.fr/accounts.login'
 # TODO get value Callback
 # callback: jsonp_3bbusffr388pem4
 
-URL_API_KEY = 'https://www.6play.fr/client-37978e84c0.bundle.js'
-# https://www.6play.fr/connexion (js above (TODO))
+URL_GET_JS_ID_API_KEY = 'https://www.6play.fr/connexion'
+
+URL_API_KEY = 'https://www.6play.fr/client-%s.bundle.js'
+# Id
 
 URL_TOKEN_DRM = 'https://6play-users.6play.fr/v2/platforms/m6group_web/services/6play/users/%s/videos/%s/upfront-token'
 
@@ -290,8 +292,11 @@ def list_videos(params):
 
     # TO DO Playlist More one 'clips'
 
+    result_js_id = re.compile(
+        r'client\-(.*?)\.bundle\.js').findall(
+            utils.get_webcontent(URL_GET_JS_ID_API_KEY))[0]
 
-    result = utils.get_webcontent(URL_API_KEY)
+    result = utils.get_webcontent(URL_API_KEY % result_js_id)
 
     api_key = re.compile(
             r'\"login.6play.fr\"\,key\:\"(.*?)\"'
