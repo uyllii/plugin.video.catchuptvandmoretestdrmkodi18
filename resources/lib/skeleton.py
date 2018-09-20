@@ -34,6 +34,14 @@ SKELETON = {
         ('live_tv', 'generic_menu'): {
 
             ('fr', 'build_live_tv_menu'): [
+                ('m6', 'none'),
+                ('w9', 'none'),
+                ('6ter', 'none'),
+                ('fun_radio', 'none'),
+                ('rtl2', 'none'),
+                # ('teva', 'none'),
+                # ('parispremiere', 'none'),
+                ('mb', 'none'),
             ]
         },
 
@@ -82,7 +90,8 @@ CHANNELS = {
     'fun_radio': '6play',
     'rtl2': '6play',
     'teva': '6play',
-    'parispremiere': '6play'
+    'parispremiere': '6play',
+    'mb': '6play'
 }
 
 '''
@@ -107,7 +116,8 @@ LABELS = {
     'fun_radio': 'Fun Radio',
     'rtl2': 'RTL 2',
     'teva': 'Teva',
-    'parispremiere': 'Paris Première'
+    'parispremiere': 'Paris Première',
+    'mb': 'M6 Boutique'
 
 
 }

@@ -20,6 +20,8 @@
     Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
+import json
+import re
 import os
 import time
 import datetime
@@ -32,13 +34,30 @@ from resources.lib import utils
 
 XMLTV_FILEPATH = os.path.join(common.ADDON_DATA, 'xmltv_fr.xml')
 
+URL_COMPTE_LOGIN = 'https://login.6play.fr/accounts.login'
+# https://login.6play.fr/accounts.login?loginID=*****&password=*******&targetEnv=mobile&format=jsonp&apiKey=3_hH5KBv25qZTd_sURpixbQW6a4OsiIzIEF2Ei_2H7TXTGLJb_1Hr4THKZianCQhWK&callback=jsonp_3bbusffr388pem4
+# TODO get value Callback
+# callback: jsonp_3bbusffr388pem4
 
+URL_GET_JS_ID_API_KEY = 'https://www.6play.fr/connexion'
+
+URL_API_KEY = 'https://www.6play.fr/client-%s.bundle.js'
+# Id
+
+URL_TOKEN_DRM = 'https://6play-users.6play.fr/v2/platforms/m6group_web/services/6play/users/%s/videos/%s/upfront-token'
+
+URL_LICENCE_KEY = 'https://lic.drmtoday.com/license-proxy-widevine/cenc/|Content-Type=&User-Agent=Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3041.0 Safari/537.36&Host=lic.drmtoday.com&x-dt-auth-token=%s|R{SSM}|JBlicense'
+# Token
 
 XMLTV_CHANNEL_ID = {
-    'canalplus': 'C34.api.telerama.fr',
-    'c8': 'C445.api.telerama.fr',
-    'cstar': 'C458.api.telerama.fr',
-    'infosportplus': ''
+    'm6': '',
+    'w9': '',
+    '6ter': '',
+    'fun_radio': '',
+    'rtl2': '',
+    # 'teva': '',
+    # 'parispremiere': '',
+    'mb': ''
 }
 
 
@@ -302,22 +321,70 @@ def build_live_tv_menu(params):
             icon = media_item_path + '.png'
 
         
-        if params.channel_name == 'canalplus' or\
-            params.channel_name == 'c8' or\
-            params.channel_name == 'cstar' or\
-            params.channel_name == 'infosportplus': 
+        if params.channel_name == 'mb' or \
+            params.channel_name == 'm6' or \
+            params.channel_name == 'w9' or \
+            params.channel_name == '6ter' or \
+            params.channel_name == 'teva' or \
+            params.channel_name == 'parispremiere':
             
-            # build LibCurl (TODO)
-            # https://github.com/peak3d/inputstream.adaptive/wiki/Playing-multi-bitrate-stream-from-a-python-addon
-            #licURL='https://secure-webtv-static.canal-plus.com/widevine/cert/cert_license_widevine_com.bin'
+            result_js_id = re.compile(
+                r'client\-(.*?)\.bundle\.js').findall(
+                    utils.get_webcontent(URL_GET_JS_ID_API_KEY))[0]
 
-            license_server = 'https://lic.drmtoday.com/license-proxy-widevine/cenc/'
+            result = utils.get_webcontent(URL_API_KEY % result_js_id)
 
-            dt_custom_data = "base64 encoded json string containing my userId and player session id"
-            x_dt_auth_token = "more base64 encoded known stuff"
-            headers = 'dt-custom-data=' + dt_custom_data + '&x-dt-auth-token=' + x_dt_auth_token + '&Origin=https://hss-m002-live-aka-canalplus.akamaized.net'
+            # login.6play.fr",key:"
+            api_key = re.compile(
+                    r'\"login.6play.fr\"\,key\:\"(.*?)\"'
+                ).findall(result)[0]
 
-            license_key = license_server + '|' + headers + '|B{SSM}|'
+            module_name = eval(params.module_path)[-1]
+
+            # Build PAYLOAD
+            payload = {
+                "loginID": common.PLUGIN.get_setting(
+                    module_name + '.login'),
+                "password": common.PLUGIN.get_setting(
+                    module_name + '.password'),
+                "apiKey": api_key,
+                "format": "jsonp",
+                "callback": "jsonp_3bbusffr388pem4"
+            }
+
+            # LOGIN
+            result_2_json = utils.get_webcontent(
+                URL_COMPTE_LOGIN, request_type='post', post_dic=payload, specific_headers={'referer':'https://www.6play.fr/connexion'})
+            result_2_jsonparser = json.loads(result_2_json.replace('jsonp_3bbusffr388pem4(', '').replace(');',''))
+            if "UID" not in result_2_jsonparser:
+                utils.send_notification(
+                    params.channel_name + ' : ' + common.ADDON.get_localized_string(30711))
+                return None
+            account_id = result_2_jsonparser["UID"]
+            account_timestamp = result_2_jsonparser["signatureTimestamp"]
+            account_signature = result_2_jsonparser["UIDSignature"]
+
+            # Build PAYLOAD headers
+            payload_headers = {
+                'x-auth-gigya-signature': account_signature,
+                'x-auth-gigya-signature-timestamp': account_timestamp,
+                'x-auth-gigya-uid': account_id,
+            }
+            if params.channel_name == '6ter':
+                token_json = utils.get_webcontent(
+                    URL_TOKEN_DRM % (account_id, 'dashcenc_6T'), specific_headers=payload_headers)
+            # elif params.channel_name == 'teva':
+            #     token_json = utils.get_webcontent(
+            #         URL_TOKEN_DRM % (account_id, 'dashcenc_TE'), specific_headers=payload_headers)
+            # elif params.channel_name == 'parispremiere':
+            #     token_json = utils.get_webcontent(
+            #         URL_TOKEN_DRM % (account_id, 'dashcenc_PP'), specific_headers=payload_headers)
+            else:
+                token_json = utils.get_webcontent(
+                    URL_TOKEN_DRM % (account_id, 'dashcenc_%s' % params.channel_name.upper()), specific_headers=payload_headers)
+            token_jsonparser = json.loads(token_json)
+            token = token_jsonparser["token"]
+
             listing.append({
                 'label': title,
                 'fanart': image,
@@ -332,10 +399,10 @@ def build_live_tv_menu(params):
                 'info': info,
                 'stream_info': stream_info,
                 'properties': {
-                    'inputstreamaddon': 'inputstream.adaptive', 
-                    'inputstream.adaptive.manifest_type': 'ism', 
+                    'inputstreamaddon': 'inputstream.adaptive',
+                    'inputstream.adaptive.manifest_type': 'mpd',
                     'inputstream.adaptive.license_type': 'com.widevine.alpha',
-                    'inputstream.adaptive.license_key': license_key
+                    'inputstream.adaptive.license_key': URL_LICENCE_KEY % token
                 },
                 'mime': 'application/dash+xml',
                 'content_lookup': False

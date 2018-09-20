@@ -11,13 +11,14 @@ Cette extension regroupe l'ensemble des vidéos des différents services et cha�
 ## Chaînes disponibles — *Available channels*
 ### France
 ##### TV
-- M6 *(Replay) (DRM capabilities) (6play account required)*
-- W9 *(Replay) (DRM capabilities) (6play account required)*
-- 6ter *(Replay) (DRM capabilities) (6play account required)*
-- Fun Radio *(Replay) (DRM capabilities) (6play account required)*
-- RTL 2 *(Replay) (DRM capabilities) (6play account required)*
+- M6 *(Replay, Live TV) (DRM capabilities) (6play account required)*
+- W9 *(Replay, Live TV) (DRM capabilities) (6play account required)*
+- 6ter *(Replay, Live TV) (DRM capabilities) (6play account required)*
+- Fun Radio *(Replay, Live TV) (DRM capabilities) (6play account required)*
+- RTL 2 *(Replay, Live TV) (DRM capabilities) (6play account required)*
 - Teva *(Replay) (DRM capabilities) (6play account required) (Paid video - purchase monthly)*
 - Paris Première *(Replay) (DRM capabilities) (6play account required) (Paid video - purchase monthly)*
+- M6 Boutique *(Live TV) (DRM capabilities) (6play account required)*
 
 ##### Web TV
 - Stories — 6play *(Replay) (DRM capabilities) (6play account required)*

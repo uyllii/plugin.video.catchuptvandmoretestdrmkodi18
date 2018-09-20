@@ -69,6 +69,9 @@
 
             <setting label="Paris Première" type="bool" id="parispremiere" default="true" visible="eq(-17,true)"/>
             <setting label="" type="number" visible="false" id="parispremiere.order" default="9"/>
+
+            <setting label="M6 Boutique" type="bool" id="mb" default="true" visible="eq(-19,true)"/>
+            <setting label="" type="number" visible="false" id="mb.order" default="10"/>
         <!-- France -->
 
     </category>
