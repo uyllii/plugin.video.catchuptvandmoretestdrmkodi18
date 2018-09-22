@@ -28,12 +28,13 @@ from resources.lib import utils
 from resources.lib import common
 
 # TO DO
-# LIVE TV protected by #EXT-X-FAXS-CM
 # Playlists (cas les blagues de TOTO)
 # Get vtt subtitle
 # Some videos not MDP (find )
 # Rework the code (ask sy6sy2)
 # Some DRM (m3u8) not working old videos (Kamelot)
+# MPD RTL2 / Fun Radio don't work (403 to get licence key)
+# Extrait don't work (mp4) / Find a way to not set MPD for this videos
 
 # Thank you (https://github.com/peak3d/plugin.video.simple)
 
@@ -91,8 +92,9 @@ URL_API_KEY = 'https://www.6play.fr/client-%s.bundle.js'
 
 URL_TOKEN_DRM = 'https://6play-users.6play.fr/v2/platforms/m6group_web/services/6play/users/%s/videos/%s/upfront-token'
 
+#URL_LICENCE_KEY = 'https://lic.drmtoday.com/license-proxy-widevine/cenc/|Content-Type=&User-Agent=Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3041.0 Safari/537.36&Host=lic.drmtoday.com&Origin=https://www.6play.fr&Referer=%s&x-dt-auth-token=%s|R{SSM}|JBlicense'
 URL_LICENCE_KEY = 'https://lic.drmtoday.com/license-proxy-widevine/cenc/|Content-Type=&User-Agent=Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3041.0 Safari/537.36&Host=lic.drmtoday.com&x-dt-auth-token=%s|R{SSM}|JBlicense'
-# Token
+# Referer, Token
 
 URL_LIVE_JSON = 'https://pc.middleware.6play.fr/6play/v2/platforms/m6group_web/services/6play/live?channel=%s&with=service_display_images,nextdiffusion,extra_data'
 # Chaine
@@ -384,74 +386,42 @@ def list_videos(params):
         context_menu = []
         context_menu.append(download_video)
 
-        is_drm = False
-        all_datas_videos_path = []
-        if video['clips'][0]['assets'] is not None:
-            for asset in video['clips'][0]['assets']:
-                if 'http_h264' in asset["type"]:
-                    all_datas_videos_path.append(
-                        asset['full_physical_path'].encode('utf-8'))
-                    break
-                elif 'h264' in asset["type"]:
-                    manifest = utils.get_webcontent(
-                        asset['full_physical_path'].encode('utf-8'),
-                            random_ua=True)
-                    if 'drm' not in manifest:
-                        all_datas_videos_path.append(
-                            asset['full_physical_path'].encode('utf-8'))
-                        break
+        # Build PAYLOAD headers
+        payload_headers = {
+            'x-auth-gigya-signature': account_signature,
+            'x-auth-gigya-signature-timestamp': account_timestamp,
+            'x-auth-gigya-uid': account_id,
+        }
+        token_json = utils.get_webcontent(
+            URL_TOKEN_DRM % (account_id, video_id), specific_headers=payload_headers)
+        token_jsonparser = json.loads(token_json)
+        token = token_jsonparser["token"]
 
-        if len(all_datas_videos_path) == 0:
-            is_drm = True
+        # Work for referer not fix RTL 2 or Fun Radio
+        # https://www.6play.fr/le-son-pop-rock-p_10207/ben-harper-en-session-tres-tres-privee-p_3471
+        # referer = 'https://www.6play.fr/%s-p_%s/%s-c_%s' % (video['program']['code'], video['program']['id'], video['clips'][0]['code'], video_id)
+        #referer = ''
 
-        if is_drm:
-            # Build PAYLOAD headers
-            payload_headers = {
-                'x-auth-gigya-signature': account_signature,
-                'x-auth-gigya-signature-timestamp': account_timestamp,
-                'x-auth-gigya-uid': account_id,
-            }
-            token_json = utils.get_webcontent(
-                URL_TOKEN_DRM % (account_id, video_id), specific_headers=payload_headers)
-            token_jsonparser = json.loads(token_json)
-            token = token_jsonparser["token"]
-
-            videos.append({
-                'label': title,
-                'thumb': program_img,
-                'url': common.PLUGIN.get_url(
-                    module_path=params.module_path,
-                    module_name=params.module_name,
-                    action='replay_entry',
-                    next='play_r',
-                    video_id=video_id,
-                ),
-                'is_playable': True,
-                'info': info,
-                'properties': {
-                    'inputstreamaddon': 'inputstream.adaptive',
-                    'inputstream.adaptive.manifest_type': 'mpd',
-                    'inputstream.adaptive.license_type': 'com.widevine.alpha',
-                    'inputstream.adaptive.license_key': URL_LICENCE_KEY % token
-                },
-                'context_menu': context_menu
-            })
-
-        else:
-            videos.append({
-                'label': title,
-                'thumb': program_img,
-                'url': common.PLUGIN.get_url(
-                    module_path=params.module_path,
-                    module_name=params.module_name,
-                    action='replay_entry',
-                    next='play_r',
-                    video_id=video_id,
-                ),
-                'is_playable': True,
-                'info': info,
-                'context_menu': context_menu
-            })
+        videos.append({
+            'label': title,
+            'thumb': program_img,
+            'url': common.PLUGIN.get_url(
+                module_path=params.module_path,
+                module_name=params.module_name,
+                action='replay_entry',
+                next='play_r',
+                video_id=video_id,
+            ),
+            'is_playable': True,
+            'info': info,
+            'properties': {
+                'inputstreamaddon': 'inputstream.adaptive',
+                'inputstream.adaptive.manifest_type': 'mpd',
+                'inputstream.adaptive.license_type': 'com.widevine.alpha',
+                'inputstream.adaptive.license_key': URL_LICENCE_KEY % token
+            },
+            'context_menu': context_menu
+        })
 
     return common.PLUGIN.create_listing(
         videos,
@@ -494,24 +464,9 @@ def get_video_url(params):
         # desired_quality = common.PLUGIN.get_setting('quality')
         url_stream = ''
 
-        all_datas_videos_path = []
         for asset in video_assets:
-            if 'http_h264' in asset["type"]:
-                all_datas_videos_path.append(
-                    asset['full_physical_path'].encode('utf-8'))
-            elif 'h264' in asset["type"]:
-                manifest = utils.get_webcontent(
-                    asset['full_physical_path'].encode('utf-8'),
-                        random_ua=True)
-                if 'drm' not in manifest:
-                    all_datas_videos_path.append(
-                        asset['full_physical_path'].encode('utf-8'))
-        if len(all_datas_videos_path) > 0:
-            url_stream = all_datas_videos_path[0]
-        else:
-            for asset in video_assets:
-                if 'usp_dashcenc_h264' in asset["type"]:
-                    url_stream = asset['full_physical_path'].encode('utf-8')
+            if 'usp_dashcenc_h264' in asset["type"]:
+                url_stream = asset['full_physical_path'].encode('utf-8')
         return url_stream
     elif params.next == 'play_l':
         if params.channel_name == 'fun_radio' or \
