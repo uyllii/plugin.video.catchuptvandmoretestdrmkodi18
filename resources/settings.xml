@@ -29,6 +29,8 @@
         <setting label="30050" type="bool" id="fr" default="true"/>
         <setting label="" type="number" visible="false" id="fr.order" default="1"/>
 
+        <setting label="30054" type="bool" id="be" default="true"/>
+        <setting label="" type="number" visible="false" id="be.order" default="2"/>
     </category>
     <!-- Countries-->
 
@@ -77,6 +79,31 @@
     </category>
     <!-- Channels --> 
 
+    <!-- Belgium -->
+        <setting label="30081" type="lsep" subsetting="true" visible="eq(1,true)"/>
+        <setting label="" type="bool" id="be" default="true" visible="false"/>
+
+            <setting label="RTL-TVI" type="bool" id="rtl_tvi" default="true" visible="eq(-1,true)"/>
+            <setting label="" type="number" visible="false" id="rtl_tvi.order" default="1"/>
+
+            <setting label="PLUG RTL" type="bool" id="plug_rtl" default="true" visible="eq(-3,true)"/>
+            <setting label="" type="number" visible="false" id="plug_rtl.order" default="2"/>
+
+            <setting label="CLUB RTL" type="bool" id="club_rtl" default="true" visible="eq(-5,true)"/>
+            <setting label="" type="number" visible="false" id="club_rtl.order" default="3"/>
+
+            <setting label="RTL INFO" type="bool" id="rtl_info" default="true" visible="eq(-7,true)"/>
+            <setting label="" type="number" visible="false" id="rtl_info.order" default="4"/>
+
+            <setting label="BEL RTL" type="bool" id="bel_rtl" default="true" visible="eq(-9,true)"/>
+            <setting label="" type="number" visible="false" id="bel_rtl.order" default="5"/>
+
+            <setting label="Contact" type="bool" id="contact" default="true" visible="eq(-11,true)"/>
+            <setting label="" type="number" visible="false" id="contact.order" default="6"/>
+
+            <setting label="RTL Sport" type="bool" id="rtl_sport" default="true" visible="eq(-13,true)"/>
+            <setting label="" type="number" visible="false" id="rtl_sport.order" default="7"/>
+        <!-- Belgium -->
 
 
 
@@ -130,6 +157,12 @@
 
             <setting label="30244" type="text" id="6play.login" visible="eq(-1,true)" defaut=""/>
             <setting label="30245" type="text" id="6play.password" option="hidden" visible="eq(-2,true)" defaut=""/>
+
+        <setting label="30081" type="lsep" subsetting="true" visible="eq(1,true)"/>
+        <setting label="" type="bool" id="be" default="true" visible="false"/>
+
+            <setting label="30246" type="text" id="rtlplaybe.login" visible="eq(-1,true)" defaut=""/>
+            <setting label="30247" type="text" id="rtlplaybe.password" option="hidden" visible="eq(-2,true)" defaut=""/>
 
     </category>
     <!-- Accounts -->

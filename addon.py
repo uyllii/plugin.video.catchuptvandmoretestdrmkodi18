@@ -25,6 +25,7 @@ from resources.lib import common
 from resources.lib import vpn
 from resources.lib import utils
 from resources.lib.root.channels.fr import live_tv_fr
+from resources.lib.root.channels.be import live_tv_be
 
 @common.PLUGIN.action()
 def root(params):
@@ -226,6 +227,8 @@ def build_live_tv_menu(params):
     country = folder_path[-1]
     if country == "fr":
         return live_tv_fr.build_live_tv_menu(params)
+    elif country == "be":
+        return live_tv_be.build_live_tv_menu(params)
     else:
 
         # First we sort channels
@@ -338,6 +341,8 @@ def start_live_tv_stream(params):
 
     # Fix tempo pour le XMLTV de France
     if "'fr'," in params.module_path:
+        return channel.start_live_tv_stream(params)
+    elif "'be'," in params.module_path:
         return channel.start_live_tv_stream(params)
     else:
         return channel.get_video_url(params)

@@ -289,6 +289,14 @@ msgctxt "#30245"
 msgid "6play Password"
 msgstr "Mot de passe 6play"
 
+msgctxt "#30246"
+msgid "RTLPlay Login"
+msgstr "Login RTLPlay"
+
+msgctxt "#30247"
+msgid "RTLPlay Password"
+msgstr "Mot de passe RTLPlay"
+
 # Reserved space for other tab/category in settins (from 30260 to 30339)
 
 

@@ -42,10 +42,30 @@ SKELETON = {
                 # ('teva', 'none'),
                 # ('parispremiere', 'none'),
                 ('mb', 'none'),
+            ],
+
+            ('be', 'build_live_tv_menu'): [
+                # ('rtl_tvi', 'none'),
+                # ('plug_rtl', 'none'),
+                # ('club_rtl', 'none'),
+                # ('rtl_info', 'none'),
+                # ('bel_rtl', 'none'),
+                # ('contact', 'none'),
+                # ('rtl_sport', 'none')
             ]
         },
 
         ('replay', 'generic_menu'): {
+
+            ('be', 'generic_menu'): [
+                ('rtl_tvi', 'replay_entry'),
+                ('plug_rtl', 'replay_entry'),
+                ('club_rtl', 'replay_entry'),
+                ('rtl_info', 'replay_entry'),
+                ('bel_rtl', 'replay_entry'),
+                ('contact', 'replay_entry'),
+                ('rtl_sport', 'replay_entry')
+            ],
 
             ('fr', 'generic_menu'): [
                 ('m6', 'replay_entry'),
@@ -91,7 +111,14 @@ CHANNELS = {
     'rtl2': '6play',
     'teva': '6play',
     'parispremiere': '6play',
-    'mb': '6play'
+    'mb': '6play',
+    'rtl_tvi': 'rtlplaybe',
+    'plug_rtl': 'rtlplaybe',
+    'club_rtl': 'rtlplaybe',
+    'rtl_info': 'rtlplaybe',
+    'bel_rtl': 'rtlplaybe',
+    'contact': 'rtlplaybe',
+    'rtl_sport': 'rtlplaybe'
 }
 
 '''
@@ -105,7 +132,17 @@ LABELS = {
     'websites': 'Websites',
 
     # Countries
+    'be': 'Belgium',
     'fr': 'France',
+
+    # Belgium channels / live TV
+    'rtl_tvi': 'RTL-TVI',
+    'plug_rtl': 'PLUG RTL',
+    'club_rtl': 'CLUB RTL',
+    'contact': 'Contact',
+    'bel_rtl': 'BEL RTL',
+    'rtl_info': 'RTL INFO',
+    'rtl_sport': 'RTL Sport',
 
     # French channels / live TV
     'stories': 'Stories (6play)',

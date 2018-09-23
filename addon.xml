@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="plugin.video.catchuptvandmoretestdrmkodi18"
        name="Catch-up TV &amp; More Test DRM Kodi 18"
-       version="0.0.1~beta05"
+       version="0.0.1~beta06"
        provider-name="SylvainCcchetto,wwark">
   <requires>
     <import addon="xbmc.python" version="2.25.0"/>
@@ -35,6 +35,7 @@
 [DRM] Replay with DRM capabilites for Group M6 (wwark and thanks peak3d)
 [Add/Remove Channels] Add RTL 2 / Remove Bruce, Crazy Kitchen, Home Time, Sixième Style (wwark)
 [Add Live TV] M6, W9, 6Ter, Fun Radio, RTL 2 and M6 Boutique (wwark)
+[Add Channel] Group RTL BE DRM capabilities (BE) (wwark)
     </news>
     <assets>
       <icon>icon.png</icon>
