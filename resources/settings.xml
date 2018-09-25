@@ -74,12 +74,27 @@
 
             <setting label="M6 Boutique" type="bool" id="mb" default="true" visible="eq(-19,true)"/>
             <setting label="" type="number" visible="false" id="mb.order" default="10"/>
+
+            <setting label="TF1" type="bool" id="tf1" default="true" visible="eq(-21,true)"/>
+            <setting label="" type="number" visible="false" id="tf1.order" default="11"/>
+
+            <setting label="TMC" type="bool" id="tmc" default="true" visible="eq(-23,true)"/>
+            <setting label="" type="number" visible="false" id="tmc.order" default="12"/>
+
+            <setting label="TFX" type="bool" id="tfx" default="true" visible="eq(-25,true)"/>
+            <setting label="" type="number" visible="false" id="tfx.order" default="13"/>
+
+            <setting label="TF1 Séries Films" type="bool" id="tf1-series-films" default="true" visible="eq(-27,true)"/>
+            <setting label="" type="number" visible="false" id="tf1-series-films.order" default="14"/>
+
+            <setting label="Tfou (MYTF1)" type="bool" id="tfou" default="true" visible="eq(-29,true)"/>
+            <setting label="" type="number" visible="false" id="tfou.order" default="15"/>
+
+            <setting label="Xtra (MYTF1)" type="bool" id="xtra" default="true" visible="eq(-31,true)"/>
+            <setting label="" type="number" visible="false" id="xtra.order" default="16"/>
         <!-- France -->
 
-    </category>
-    <!-- Channels --> 
-
-    <!-- Belgium -->
+        <!-- Belgium -->
         <setting label="30081" type="lsep" subsetting="true" visible="eq(1,true)"/>
         <setting label="" type="bool" id="be" default="true" visible="false"/>
 
@@ -105,7 +120,8 @@
             <setting label="" type="number" visible="false" id="rtl_sport.order" default="7"/>
         <!-- Belgium -->
 
-
+    </category>
+    <!-- Channels -->
 
     <!-- Websites -->     
     <category label="30007">

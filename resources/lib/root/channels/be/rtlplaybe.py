@@ -22,6 +22,7 @@
 """
 
 
+import inputstreamhelper
 import json
 import re
 from resources.lib import utils
@@ -324,6 +325,10 @@ def list_videos(params):
     account_id = result_2_jsonparser["UID"]
     account_timestamp = result_2_jsonparser["signatureTimestamp"]
     account_signature = result_2_jsonparser["UIDSignature"]
+
+    is_helper = inputstreamhelper.Helper('mpd', drm='widevine')
+    if not is_helper.check_inputstream():
+        return False
     
     for video in json_parser:
         video_id = str(video['id'])
@@ -461,11 +466,14 @@ def get_video_url(params):
             if 'usp_dashcenc_h264' in asset["type"]:
                 url_stream = asset['full_physical_path'].encode('utf-8')
         return url_stream
+
     elif params.next == 'play_l':
-    
+
+        print 'enter get_video_url'
+
         result_js_id = re.compile(
-        r'client\-(.*?)\.bundle\.js').findall(
-            utils.get_webcontent(URL_GET_JS_ID_API_KEY))[0]
+            r'client\-(.*?)\.bundle\.js').findall(
+                utils.get_webcontent(URL_GET_JS_ID_API_KEY))[0]
 
         result = utils.get_webcontent(URL_API_KEY % result_js_id)
 
@@ -473,6 +481,7 @@ def get_video_url(params):
                 r'\"sso-login.rtl.be\"\,key\:\"(.*?)\"'
             ).findall(result)[0]
 
+        print 'api_key : ' + api_key
         module_name = eval(params.module_path)[-1]
 
         # Build PAYLOAD
@@ -488,7 +497,7 @@ def get_video_url(params):
 
         # LOGIN
         result_2_json = utils.get_webcontent(
-            URL_COMPTE_LOGIN, request_type='post', post_dic=payload, specific_headers={'referer':'https://www.rtlplay.be/connexion'})
+            URL_COMPTE_LOGIN, request_type='post', post_dic=payload, specific_headers={'referer':'https://www.rtlplay.be/connexion', 'x-customer-name': 'rtlbe'})
         result_2_jsonparser = json.loads(result_2_json.replace('jsonp_3bbusffr388pem4(', '').replace(');',''))
         if "UID" not in result_2_jsonparser:
             utils.send_notification(
@@ -497,6 +506,10 @@ def get_video_url(params):
         account_id = result_2_jsonparser["UID"]
         account_timestamp = result_2_jsonparser["signatureTimestamp"]
         account_signature = result_2_jsonparser["UIDSignature"]
+
+        print 'account_id : ' + account_id
+        print 'account_timestamp : ' + account_timestamp
+        print 'account_signature : ' + account_signature
 
         payload_headers = {
             'x-auth-gigya-signature': account_signature,
@@ -510,9 +523,20 @@ def get_video_url(params):
             'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36'
         }
 
+        # Origin: https://www.rtlplay.be
+        # Referer: https://www.rtlplay.be/tvi/direct
+        # User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36
+        # x-auth-device-id: _luid_0a467294-309d-409d-a5f1-88ffdb9bbe27
+        # x-auth-gigya-signature: EpMVE4kYK9yIjv99eIRqIAbsGEs=
+        # x-auth-gigya-signature-timestamp: 1537698286
+        # x-auth-gigya-uid: 7b2f6950d9da46f68e0e8dc8ee364758
+        # x-client-release: m6group_web-4.67.0
+        # x-customer-name: rtlbe
+
         video_json = utils.get_webcontent(
             URL_LIVE_JSON % (params.channel_name),
-            specific_headers=payload_headers)
+                random_ua=True,
+                specific_headers=payload_headers)
         json_parser = json.loads(video_json)
         video_assets = json_parser['rtlbe_' + params.channel_name][0]['live']['assets']
         url_stream = ''

@@ -20,6 +20,7 @@
     Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
+import inputstreamhelper
 import json
 import re
 import os
@@ -55,9 +56,13 @@ XMLTV_CHANNEL_ID = {
     '6ter': '',
     'fun_radio': '',
     'rtl2': '',
-    # 'teva': '',
-    # 'parispremiere': '',
-    'mb': ''
+    'teva': '',
+    'parispremiere': '',
+    'mb': '',
+    'tf1': '',
+    'tmc': '',
+    'tfx': '',
+    'tf1-series-films': ''
 }
 
 
@@ -336,7 +341,7 @@ def build_live_tv_menu(params):
 
             # login.6play.fr",key:"
             api_key = re.compile(
-                    r'\"login.6play.fr\"\,key\:\"(.*?)\"'
+                    r'\"eu1.gigya.com\"\,key\:\"(.*?)\"'
                 ).findall(result)[0]
 
             module_name = eval(params.module_path)[-1]
@@ -364,6 +369,9 @@ def build_live_tv_menu(params):
             account_timestamp = result_2_jsonparser["signatureTimestamp"]
             account_signature = result_2_jsonparser["UIDSignature"]
 
+            is_helper = inputstreamhelper.Helper('mpd', drm='widevine')
+            if not is_helper.check_inputstream():
+                return False
             # Build PAYLOAD headers
             payload_headers = {
                 'x-auth-gigya-signature': account_signature,
@@ -373,12 +381,12 @@ def build_live_tv_menu(params):
             if params.channel_name == '6ter':
                 token_json = utils.get_webcontent(
                     URL_TOKEN_DRM % (account_id, 'dashcenc_6T'), specific_headers=payload_headers)
-            # elif params.channel_name == 'teva':
-            #     token_json = utils.get_webcontent(
-            #         URL_TOKEN_DRM % (account_id, 'dashcenc_TE'), specific_headers=payload_headers)
-            # elif params.channel_name == 'parispremiere':
-            #     token_json = utils.get_webcontent(
-            #         URL_TOKEN_DRM % (account_id, 'dashcenc_PP'), specific_headers=payload_headers)
+            elif params.channel_name == 'teva':
+                token_json = utils.get_webcontent(
+                    URL_TOKEN_DRM % (account_id, 'dashcenc_TE'), specific_headers=payload_headers)
+            elif params.channel_name == 'parispremiere':
+                token_json = utils.get_webcontent(
+                    URL_TOKEN_DRM % (account_id, 'dashcenc_PP'), specific_headers=payload_headers)
             else:
                 token_json = utils.get_webcontent(
                     URL_TOKEN_DRM % (account_id, 'dashcenc_%s' % params.channel_name.upper()), specific_headers=payload_headers)

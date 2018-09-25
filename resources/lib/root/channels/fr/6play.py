@@ -22,6 +22,7 @@
 """
 
 
+import inputstreamhelper
 import json
 import re
 from resources.lib import utils
@@ -304,7 +305,7 @@ def list_videos(params):
     result = utils.get_webcontent(URL_API_KEY % result_js_id)
 
     api_key = re.compile(
-            r'\"login.6play.fr\"\,key\:\"(.*?)\"'
+            r'\"eu1.gigya.com\"\,key\:\"(.*?)\"'
         ).findall(result)[0]
 
     module_name = eval(params.module_path)[-1]
@@ -331,6 +332,10 @@ def list_videos(params):
     account_id = result_2_jsonparser["UID"]
     account_timestamp = result_2_jsonparser["signatureTimestamp"]
     account_signature = result_2_jsonparser["UIDSignature"]
+
+    is_helper = inputstreamhelper.Helper('mpd', drm='widevine')
+    if not is_helper.check_inputstream():
+        return False
 
     for video in json_parser:
         video_id = str(video['id'])
@@ -482,18 +487,18 @@ def get_video_url(params):
                 random_ua=True)
             json_parser = json.loads(video_json)
             video_assets = json_parser[ '6T'][0]['live']['assets']
-        # elif params.channel_name == 'teva':
-        #     video_json = utils.get_webcontent(
-        #         URL_LIVE_JSON % 'TE',
-        #         random_ua=True)
-        #     json_parser = json.loads(video_json)
-        #     video_assets = json_parser[ 'TE'][0]['live']['assets']
-        # elif params.channel_name == 'parispremiere':
-        #     video_json = utils.get_webcontent(
-        #         URL_LIVE_JSON % 'PP',
-        #         random_ua=True)
-        #     json_parser = json.loads(video_json)
-        #     video_assets = json_parser[ 'PP'][0]['live']['assets']
+        elif params.channel_name == 'teva':
+            video_json = utils.get_webcontent(
+                URL_LIVE_JSON % 'TE',
+                random_ua=True)
+            json_parser = json.loads(video_json)
+            video_assets = json_parser[ 'TE'][0]['live']['assets']
+        elif params.channel_name == 'parispremiere':
+            video_json = utils.get_webcontent(
+                URL_LIVE_JSON % 'PP',
+                random_ua=True)
+            json_parser = json.loads(video_json)
+            video_assets = json_parser[ 'PP'][0]['live']['assets']
         else:
             video_json = utils.get_webcontent(
                 URL_LIVE_JSON % (params.channel_name.upper()),

@@ -33,13 +33,10 @@ from resources.lib import utils
 XMLTV_FILEPATH = os.path.join(common.ADDON_DATA, 'xmltv_fr.xml')
 
 XMLTV_CHANNEL_ID = {
-    # 'rtl_tvi': '',
-    # 'plug_rtl': '',
-    # 'club_rtl': '',
-    # 'rtl_info': '',
-    # 'bel_rtl': '',
-    # 'contact': '',
-    # 'rtl_sport': ''
+    'rtl_tvi': '',
+    'plug_rtl': '',
+    'club_rtl': '',
+    'contact': ''
 }
 
 

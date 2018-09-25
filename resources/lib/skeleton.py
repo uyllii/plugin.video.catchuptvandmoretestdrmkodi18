@@ -42,16 +42,17 @@ SKELETON = {
                 # ('teva', 'none'),
                 # ('parispremiere', 'none'),
                 ('mb', 'none'),
+                # ('tf1', 'none'),
+                # ('tmc', 'none'),
+                # ('tfx', 'none'),
+                # ('tf1-series-films', 'none')
             ],
 
             ('be', 'build_live_tv_menu'): [
-                # ('rtl_tvi', 'none'),
-                # ('plug_rtl', 'none'),
-                # ('club_rtl', 'none'),
-                # ('rtl_info', 'none'),
-                # ('bel_rtl', 'none'),
-                # ('contact', 'none'),
-                # ('rtl_sport', 'none')
+                ('rtl_tvi', 'none'),
+                ('plug_rtl', 'none'),
+                ('club_rtl', 'none'),
+                ('contact', 'none')
             ]
         },
 
@@ -76,7 +77,13 @@ SKELETON = {
                 ('fun_radio', 'replay_entry'),
                 ('rtl2', 'replay_entry'),
                 ('teva', 'replay_entry'),
-                ('parispremiere', 'replay_entry')
+                ('parispremiere', 'replay_entry'),
+                # ('tf1', 'replay_entry'),
+                # ('tmc', 'replay_entry'),
+                # ('tfx', 'replay_entry'),
+                # ('tf1-series-films', 'replay_entry'),
+                # ('tfou', 'replay_entry'),
+                # ('xtra', 'replay_entry'),
             ]
 
         },
@@ -118,7 +125,13 @@ CHANNELS = {
     'rtl_info': 'rtlplaybe',
     'bel_rtl': 'rtlplaybe',
     'contact': 'rtlplaybe',
-    'rtl_sport': 'rtlplaybe'
+    'rtl_sport': 'rtlplaybe',
+    'tf1': 'tf1',
+    'tmc': 'tf1',
+    'tfx': 'tf1',
+    'tf1-series-films': 'tf1',
+    'tfou': 'tf1',
+    'xtra': 'tf1',
 }
 
 '''
@@ -154,7 +167,13 @@ LABELS = {
     'rtl2': 'RTL 2',
     'teva': 'Teva',
     'parispremiere': 'Paris Première',
-    'mb': 'M6 Boutique'
+    'mb': 'M6 Boutique',
+    'tf1': 'TF1',
+    'tmc': 'TMC',
+    'tfx': 'TFX',
+    'tf1-series-films': 'TF1 Séries Films',
+    'tfou': 'Tfou (MYTF1)',
+    'xtra': 'Xtra (MYTF1)'
 
 
 }
