@@ -56,13 +56,13 @@ XMLTV_CHANNEL_ID = {
     '6ter': '',
     'fun_radio': '',
     'rtl2': '',
-    'teva': '',
-    'parispremiere': '',
+    # 'teva': '',
+    # 'parispremiere': '',
     'mb': '',
-    'tf1': '',
-    'tmc': '',
-    'tfx': '',
-    'tf1-series-films': ''
+    # 'tf1': '',
+    # 'tmc': '',
+    # 'tfx': '',
+    # 'tf1-series-films': ''
 }
 
 
