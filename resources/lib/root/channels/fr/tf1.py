@@ -22,6 +22,7 @@
 """
 
 import ast
+import inputstreamhelper
 import json
 import re
 import os
@@ -33,6 +34,7 @@ from resources.lib import common
 # Quality Mode on LIVE TV
 # Replay LCI add More Buttons
 # DRM (SAMPLE-AES) for Replay => https://github.com/peak3d/inputstream.adaptive/issues/96
+# https://bitmovin.com/demos/drm
 
 
 URL_ROOT = "http://www.tf1.fr/"
@@ -50,13 +52,10 @@ HOSTING_APPLICATION_VERSION = '7.0.4'
 IMG_WIDTH = 640
 IMG_HEIGHT = 360
 
-URL_VIDEO_STREAM = 'https://www.wat.tv/get/webhtml/%s'
+URL_VIDEO_STREAM = 'https://delivery.tf1.fr/mytf1-wrd/%s'
 
-# https://www.wat.tv/interface/contentv4/13582183?context=MYTF1
-# URL_VIDEO_STREAM = 'https://delivery.tf1.fr/mytf1-wrd/%s'
-
-# URL_DRM = 'https://drm-wide.tf1.fr/proxy?id=%s'
-# IdVideo ?
+URL_LICENCE_KEY = 'https://drm-wide.tf1.fr/proxy?id=%s|Content-Type=&User-Agent=Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3041.0 Safari/537.36&Host=drm-wide.tf1.fr|R{SSM}|'
+# videoId
 
 DESIRED_QUALITY = common.PLUGIN.get_setting('quality')
 
@@ -309,6 +308,10 @@ def list_videos(params):
             'ul',
             class_='grid')
 
+        is_helper = inputstreamhelper.Helper('mpd', drm='widevine')
+        if not is_helper.check_inputstream():
+            return False
+
         if grid is not None:
             for li in grid.find_all('li'):
                 video_type_string = li.find(
@@ -370,6 +373,25 @@ def list_videos(params):
 
                     program_id = li.find('a')['href'].encode('utf-8')
 
+                    if 'www.wat.tv/embedframe' in program_id:
+                        url = 'http:' + program_id
+                    elif "http" not in program_id:
+                        if program_id[0] == '/':
+                            program_id = program_id[1:]
+                        url = URL_ROOT + program_id
+                    else:
+                        url = program_id
+                    video_html = utils.get_webcontent(url)
+
+                    if 'www.wat.tv/embedframe' in program_id:
+                        video_id = re.compile('UVID=(.*?)&').findall(video_html)[0]
+                    else:
+                        video_html_soup = bs(video_html, 'html.parser')
+                        iframe_player_soup = video_html_soup.find(
+                            'div',
+                            class_='iframe_player')
+                        video_id = iframe_player_soup['data-watid'].encode('utf-8')
+
                     info = {
                         'video': {
                             'title': title,
@@ -405,6 +427,12 @@ def list_videos(params):
                         ),
                         'is_playable': True,
                         'info': info,
+                        'properties': {
+                            'inputstreamaddon': 'inputstream.adaptive',
+                            'inputstream.adaptive.manifest_type': 'mpd',
+                            'inputstream.adaptive.license_type': 'com.widevine.alpha',
+                            'inputstream.adaptive.license_key': URL_LICENCE_KEY % video_id
+                        },
                         'context_menu': context_menu
                     })
 
@@ -474,42 +502,7 @@ def get_video_url(params):
         htlm_json = utils.get_webcontent(url_json, random_ua=True)
         json_parser = json.loads(htlm_json)
 
-        # Check DRM in the m3u8 file
-        manifest = utils.get_webcontent(
-            json_parser["hls"],
-            random_ua=True)
-        if 'drm' in manifest:
-            utils.send_notification(common.ADDON.get_localized_string(30702))
-            return ''
-
-        root = os.path.dirname(json_parser["hls"])
-        manifest = utils.get_webcontent(
-            json_parser["hls"].split('&max_bitrate=')[0])
-
-        lines = manifest.splitlines()
-        all_datas_videos_quality = []
-        all_datas_videos_path = []
-        for k in range(0, len(lines) - 1):
-            if 'RESOLUTION=' in lines[k]:
-                all_datas_videos_quality.append(
-                    re.compile(
-                    r'RESOLUTION=(.*?),').findall(
-                    lines[k])[0])
-                all_datas_videos_path.append(
-                    root + '/' + lines[k + 1])
-        if DESIRED_QUALITY == "DIALOG":
-            seleted_item = common.sp.xbmcgui.Dialog().select(
-                common.GETTEXT('Choose video quality'),
-                all_datas_videos_quality)
-            return all_datas_videos_path[seleted_item].encode(
-                'utf-8')
-        elif DESIRED_QUALITY == 'BEST':
-            # Last video in the Best
-            for k in all_datas_videos_path:
-                url = k
-            return url
-        else:
-            return all_datas_videos_path[0]
+        return json_parser["url"].split('&max_bitrate=')[0]
 
     elif params.next == 'play_l':
 

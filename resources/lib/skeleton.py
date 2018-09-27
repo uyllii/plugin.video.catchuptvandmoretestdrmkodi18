@@ -42,10 +42,10 @@ SKELETON = {
                 # ('teva', 'none'),
                 # ('parispremiere', 'none'),
                 ('mb', 'none'),
-                # ('tf1', 'none'),
-                # ('tmc', 'none'),
-                # ('tfx', 'none'),
-                # ('tf1-series-films', 'none')
+                ('tf1', 'none'),
+                ('tmc', 'none'),
+                ('tfx', 'none'),
+                ('tf1-series-films', 'none')
             ],
 
             ('be', 'build_live_tv_menu'): [
@@ -78,12 +78,12 @@ SKELETON = {
                 ('rtl2', 'replay_entry'),
                 ('teva', 'replay_entry'),
                 ('parispremiere', 'replay_entry'),
-                # ('tf1', 'replay_entry'),
-                # ('tmc', 'replay_entry'),
-                # ('tfx', 'replay_entry'),
-                # ('tf1-series-films', 'replay_entry'),
-                # ('tfou', 'replay_entry'),
-                # ('xtra', 'replay_entry'),
+                ('tf1', 'replay_entry'),
+                ('tmc', 'replay_entry'),
+                ('tfx', 'replay_entry'),
+                ('tf1-series-films', 'replay_entry'),
+                ('tfou', 'replay_entry'),
+                ('xtra', 'replay_entry'),
             ]
 
         },

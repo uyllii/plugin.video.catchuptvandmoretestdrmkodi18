@@ -29,10 +29,16 @@ Cette extension regroupe l'ensemble des vidéos des différents services et cha�
 - Teva *(Replay) (DRM capabilities) (6play account required) (Paid video - purchase monthly)*
 - Paris Première *(Replay) (DRM capabilities) (6play account required) (Paid video - purchase monthly)*
 - M6 Boutique *(Live TV) (DRM capabilities) (6play account required)*
+- TF1 *(Replay) (DRM capabilities) / (Live TV)*
+- TMC *(Replay) (DRM capabilities) / (Live TV)*
+- TFX *(Replay) (DRM capabilities) / (Live TV)*
+- TF1 Séries Films *(Replay) (DRM capabilities) / (Live TV)*
 
 ##### Web TV
 - Stories — 6play *(Replay) (DRM capabilities) (6play account required)*
 - Comic — 6play *(Replay) (DRM capabilities) (6play account required)*
+- Tfou — MYTF1 *(Replay) (DRM capabilities)*
+- Xtra — MYTF1 *(Replay) (DRM capabilities)*
 
 ## Sites internet disponibles — *Available Websites*
 
