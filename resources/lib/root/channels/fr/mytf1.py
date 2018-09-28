@@ -499,7 +499,7 @@ def get_video_url(params):
             video_id = iframe_player_soup['data-watid'].encode('utf-8')
 
         url_json = URL_VIDEO_STREAM % video_id
-        htlm_json = utils.get_webcontent(url_json, random_ua=True)
+        htlm_json = utils.get_webcontent(url_json)
         json_parser = json.loads(htlm_json)
 
         return json_parser["url"].split('&max_bitrate=')[0]

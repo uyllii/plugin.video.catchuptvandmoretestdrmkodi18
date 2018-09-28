@@ -82,8 +82,7 @@ SKELETON = {
                 ('tmc', 'replay_entry'),
                 ('tfx', 'replay_entry'),
                 ('tf1-series-films', 'replay_entry'),
-                ('tfou', 'replay_entry'),
-                ('xtra', 'replay_entry'),
+                ('tfou', 'replay_entry')
             ]
 
         },
@@ -126,12 +125,11 @@ CHANNELS = {
     'bel_rtl': 'rtlplaybe',
     'contact': 'rtlplaybe',
     'rtl_sport': 'rtlplaybe',
-    'tf1': 'tf1',
-    'tmc': 'tf1',
-    'tfx': 'tf1',
-    'tf1-series-films': 'tf1',
-    'tfou': 'tf1',
-    'xtra': 'tf1',
+    'tf1': 'mytf1',
+    'tmc': 'mytf1',
+    'tfx': 'mytf1',
+    'tf1-series-films': 'mytf1',
+    'tfou': 'mytf1'
 }
 
 '''
@@ -172,8 +170,7 @@ LABELS = {
     'tmc': 'TMC',
     'tfx': 'TFX',
     'tf1-series-films': 'TF1 Séries Films',
-    'tfou': 'Tfou (MYTF1)',
-    'xtra': 'Xtra (MYTF1)'
+    'tfou': 'Tfou (MYTF1)'
 
 
 }

@@ -38,7 +38,6 @@ Cette extension regroupe l'ensemble des vidéos des différents services et cha�
 - Stories — 6play *(Replay) (DRM capabilities) (6play account required)*
 - Comic — 6play *(Replay) (DRM capabilities) (6play account required)*
 - Tfou — MYTF1 *(Replay) (DRM capabilities)*
-- Xtra — MYTF1 *(Replay) (DRM capabilities)*
 
 ## Sites internet disponibles — *Available Websites*
 

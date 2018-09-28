@@ -89,9 +89,6 @@
 
             <setting label="Tfou (MYTF1)" type="bool" id="tfou" default="true" visible="eq(-29,true)"/>
             <setting label="" type="number" visible="false" id="tfou.order" default="15"/>
-
-            <setting label="Xtra (MYTF1)" type="bool" id="xtra" default="true" visible="eq(-31,true)"/>
-            <setting label="" type="number" visible="false" id="xtra.order" default="16"/>
         <!-- France -->
 
         <!-- Belgium -->
