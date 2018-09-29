@@ -82,7 +82,8 @@ SKELETON = {
                 ('tmc', 'replay_entry'),
                 ('tfx', 'replay_entry'),
                 ('tf1-series-films', 'replay_entry'),
-                ('tfou', 'replay_entry')
+                ('tfou', 'replay_entry'),
+                # ('francetvsport', 'replay_entry')
             ]
 
         },
@@ -129,7 +130,8 @@ CHANNELS = {
     'tmc': 'mytf1',
     'tfx': 'mytf1',
     'tf1-series-films': 'mytf1',
-    'tfou': 'mytf1'
+    'tfou': 'mytf1',
+    'francetvsport': 'francetvsport'
 }
 
 '''
@@ -170,7 +172,8 @@ LABELS = {
     'tmc': 'TMC',
     'tfx': 'TFX',
     'tf1-series-films': 'TF1 Séries Films',
-    'tfou': 'Tfou (MYTF1)'
+    'tfou': 'Tfou (MYTF1)',
+    'francetvsport': 'France TV Sport (francetv)'
 
 
 }

@@ -89,11 +89,14 @@ URL_API_KEY = 'https://www.rtlplay.be/client-%s.bundle.js'
 URL_TOKEN_DRM = 'https://6play-users.6play.fr/v2/platforms/m6group_web/services/rtlbe_rtl_play/users/%s/videos/%s/upfront-token'
 
 #URL_LICENCE_KEY = 'https://lic.drmtoday.com/license-proxy-widevine/cenc/|Content-Type=&User-Agent=Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3041.0 Safari/537.36&Host=lic.drmtoday.com&Origin=https://www.6play.fr&Referer=%s&x-dt-auth-token=%s|R{SSM}|JBlicense'
-URL_LICENCE_KEY = 'https://lic.drmtoday.com/license-proxy-widevine/cenc/|Content-Type=&User-Agent=Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3041.0 Safari/537.36&Host=lic.drmtoday.com&x-dt-auth-token=%s|R{SSM}|JBlicense'
+URL_LICENCE_KEY = 'https://lic.drmtoday.com/license-proxy-widevine/cenc/|Content-Type=&User-Agent=Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3041.0 Safari/537.36&Host=lic.drmtoday.com&x-dt-auth-token=%s&x-customer-name=rtlbe|R{SSM}|JBlicense'
 # Referer, Token
 
 URL_LIVE_JSON = 'https://pc.middleware.6play.fr/6play/v2/platforms/m6group_web/services/rtlbe_rtl_play/live?channel=rtlbe_%s&with=service_display_images,nextdiffusion,extra_data'
 # ChannelName
+
+URL_LIVE_STREAM = 'https://rtlbe.live.6cloud.fr/out/u/rtl_be/%s_ott_p.mpd'
+# https://rtlbe.live.6cloud.fr/out/u/rtl_be/rlt_tvi_ott_p.mpd
 
 def channel_entry(params):
     """Entry function of the module"""
@@ -469,78 +472,8 @@ def get_video_url(params):
 
     elif params.next == 'play_l':
 
-        print 'enter get_video_url'
+        # Not working respond 403 test mutilple cases / I extract the mpd
+        # https://pc.middleware.6play.fr/6play/v2/platforms/m6group_web/services/rtlbe_rtl_play/live?channel=rtlbe_contact&with=service_display_images,nextdiffusion,extra_data
 
-        result_js_id = re.compile(
-            r'client\-(.*?)\.bundle\.js').findall(
-                utils.get_webcontent(URL_GET_JS_ID_API_KEY))[0]
-
-        result = utils.get_webcontent(URL_API_KEY % result_js_id)
-
-        api_key = re.compile(
-                r'\"sso-login.rtl.be\"\,key\:\"(.*?)\"'
-            ).findall(result)[0]
-
-        print 'api_key : ' + api_key
-        module_name = eval(params.module_path)[-1]
-
-        # Build PAYLOAD
-        payload = {
-            "loginID": common.PLUGIN.get_setting(
-                module_name + '.login'),
-            "password": common.PLUGIN.get_setting(
-                module_name + '.password'),
-            "apiKey": api_key,
-            "format": "jsonp",
-            "callback": "jsonp_3bbusffr388pem4"
-        }
-
-        # LOGIN
-        result_2_json = utils.get_webcontent(
-            URL_COMPTE_LOGIN, request_type='post', post_dic=payload, specific_headers={'referer':'https://www.rtlplay.be/connexion', 'x-customer-name': 'rtlbe'})
-        result_2_jsonparser = json.loads(result_2_json.replace('jsonp_3bbusffr388pem4(', '').replace(');',''))
-        if "UID" not in result_2_jsonparser:
-            utils.send_notification(
-                params.channel_name + ' : ' + common.ADDON.get_localized_string(30711))
-            return None
-        account_id = result_2_jsonparser["UID"]
-        account_timestamp = result_2_jsonparser["signatureTimestamp"]
-        account_signature = result_2_jsonparser["UIDSignature"]
-
-        print 'account_id : ' + account_id
-        print 'account_timestamp : ' + account_timestamp
-        print 'account_signature : ' + account_signature
-
-        payload_headers = {
-            'x-auth-gigya-signature': account_signature,
-            'x-auth-gigya-signature-timestamp': account_timestamp,
-            'x-auth-gigya-uid': account_id,
-            'x-customer-name': 'rtlbe',
-            'Referer': 'https://www.rtlplay.be/tvi/direct',
-            'Origin': 'https://www.rtlplay.be',
-            'x-client-release': 'm6group_web-4.67.0',
-            'x-auth-device-id': '_luid_0a467294-309d-409d-a5f1-88ffdb9bbe27',
-            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36'
-        }
-
-        # Origin: https://www.rtlplay.be
-        # Referer: https://www.rtlplay.be/tvi/direct
-        # User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36
-        # x-auth-device-id: _luid_0a467294-309d-409d-a5f1-88ffdb9bbe27
-        # x-auth-gigya-signature: EpMVE4kYK9yIjv99eIRqIAbsGEs=
-        # x-auth-gigya-signature-timestamp: 1537698286
-        # x-auth-gigya-uid: 7b2f6950d9da46f68e0e8dc8ee364758
-        # x-client-release: m6group_web-4.67.0
-        # x-customer-name: rtlbe
-
-        video_json = utils.get_webcontent(
-            URL_LIVE_JSON % (params.channel_name),
-                random_ua=True,
-                specific_headers=payload_headers)
-        json_parser = json.loads(video_json)
-        video_assets = json_parser['rtlbe_' + params.channel_name][0]['live']['assets']
-        url_stream = ''
-        for asset in video_assets:
-            if 'delta_hls_h264' in asset["type"]:
-                url_stream = asset['full_physical_path'].encode('utf-8')
-        return url_stream
+        # Error 403 to get DRM key to this Url https://lic.drmtoday.com/license-proxy-widevine/cenc/
+        return URL_LIVE_STREAM % params.channel_name.replace('rtl_tvi', 'rtl_tvi').replace('contact', 'radio_contact') + '|x-customer-name=rtlbe'

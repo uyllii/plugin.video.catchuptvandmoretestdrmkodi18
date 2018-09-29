@@ -20,6 +20,9 @@
     Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
+import inputstreamhelper
+import json
+import re
 import os
 import time
 import datetime
@@ -31,6 +34,22 @@ from resources.lib import common
 from resources.lib import utils
 
 XMLTV_FILEPATH = os.path.join(common.ADDON_DATA, 'xmltv_fr.xml')
+
+URL_COMPTE_LOGIN = 'https://sso-login.rtl.be/accounts.login'
+# https://login.6play.fr/accounts.login?loginID=*****&password=*******&targetEnv=mobile&format=jsonp&apiKey=3_hH5KBv25qZTd_sURpixbQW6a4OsiIzIEF2Ei_2H7TXTGLJb_1Hr4THKZianCQhWK&callback=jsonp_3bbusffr388pem4
+# TODO get value Callback
+# callback: jsonp_3bbusffr388pem4
+
+URL_GET_JS_ID_API_KEY = 'https://www.rtlplay.be/connexion'
+
+URL_API_KEY = 'https://www.rtlplay.be/client-%s.bundle.js'
+# Id
+
+URL_TOKEN_DRM = 'https://6play-users.6play.fr/v2/platforms/m6group_web/services/rtlbe_rtl_play/users/%s/videos/%s/upfront-token'
+
+#URL_LICENCE_KEY = 'https://lic.drmtoday.com/license-proxy-widevine/cenc/|Content-Type=&User-Agent=Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3041.0 Safari/537.36&Host=lic.drmtoday.com&Origin=https://www.6play.fr&Referer=%s&x-dt-auth-token=%s|R{SSM}|JBlicense'
+URL_LICENCE_KEY = 'https://lic.drmtoday.com/license-proxy-widevine/cenc/|Content-Type=&User-Agent=Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3041.0 Safari/537.36&Host=lic.drmtoday.com&x-dt-auth-token=%s&x-customer-name=rtlbe|R{SSM}|JBlicense'
+# Referer, Token
 
 XMLTV_CHANNEL_ID = {
     'rtl_tvi': '',
@@ -299,20 +318,101 @@ def build_live_tv_menu(params):
                 "utf-8").encode(common.FILESYSTEM_CODING)
             icon = media_item_path + '.png'
 
-        listing.append({
-            'label': title,
-            'fanart': image,
-            'thumb': icon,
-            'url': common.PLUGIN.get_url(
-                module_path=params.module_path,
-                module_name=params.module_name,
-                action='start_live_tv_stream'
-            ),
-            'is_playable': is_playable,
-            'context_menu': context_menu,
-            'info': info,
-            'stream_info': stream_info,
-        })
+        if params.channel_name == 'rtl_tvi' or \
+            params.channel_name == 'plug_rtl' or \
+            params.channel_name == 'club_rtl' or \
+            params.channel_name == 'contact':
+
+            result_js_id = re.compile(
+                r'client\-(.*?)\.bundle\.js').findall(
+                    utils.get_webcontent(URL_GET_JS_ID_API_KEY))[0]
+
+            result = utils.get_webcontent(URL_API_KEY % result_js_id)
+
+            # login.6play.fr",key:"
+            api_key = re.compile(
+                    r'\"sso-login.rtl.be\"\,key\:\"(.*?)\"'
+                ).findall(result)[0]
+
+            module_name = eval(params.module_path)[-1]
+
+            # Build PAYLOAD
+            payload = {
+                "loginID": common.PLUGIN.get_setting(
+                    module_name + '.login'),
+                "password": common.PLUGIN.get_setting(
+                    module_name + '.password'),
+                "apiKey": api_key,
+                "format": "jsonp",
+                "callback": "jsonp_3bbusffr388pem4"
+            }
+
+            # LOGIN
+            result_2_json = utils.get_webcontent(
+                URL_COMPTE_LOGIN, request_type='post', post_dic=payload, specific_headers={'referer':'https://www.rtlplay.be/connexion'})
+            result_2_jsonparser = json.loads(result_2_json.replace('jsonp_3bbusffr388pem4(', '').replace(');',''))
+            if "UID" not in result_2_jsonparser:
+                utils.send_notification(
+                    params.channel_name + ' : ' + common.ADDON.get_localized_string(30711))
+                return None
+            account_id = result_2_jsonparser["UID"]
+            account_timestamp = result_2_jsonparser["signatureTimestamp"]
+            account_signature = result_2_jsonparser["UIDSignature"]
+
+            is_helper = inputstreamhelper.Helper('mpd', drm='widevine')
+            if not is_helper.check_inputstream():
+                return False
+            # Build PAYLOAD headers
+            payload_headers = {
+                'x-auth-gigya-signature': account_signature,
+                'x-auth-gigya-signature-timestamp': account_timestamp,
+                'x-auth-gigya-uid': account_id,
+                'x-customer-name': 'rtlbe'
+            }
+            token_json = utils.get_webcontent(
+                URL_TOKEN_DRM % (account_id, 'dashcenc_%s' % params.channel_name), specific_headers=payload_headers)
+            token_jsonparser = json.loads(token_json)
+            token = token_jsonparser["token"]
+
+            listing.append({
+                'label': title,
+                'fanart': image,
+                'thumb': icon,
+                'url': common.PLUGIN.get_url(
+                    module_path=params.module_path,
+                    module_name=params.module_name,
+                    action='start_live_tv_stream'
+                ),
+                'is_playable': is_playable,
+                'context_menu': context_menu,
+                'info': info,
+                'stream_info': stream_info,
+                'properties': {
+                    'inputstreamaddon': 'inputstream.adaptive',
+                    'inputstream.adaptive.manifest_type': 'mpd',
+                    'inputstream.adaptive.license_type': 'com.widevine.alpha',
+                    'inputstream.adaptive.license_key': URL_LICENCE_KEY % token
+                },
+                'mime': 'application/dash+xml',
+                'content_lookup': False
+
+            })
+
+        else:
+            listing.append({
+                'label': title,
+                'fanart': image,
+                'thumb': icon,
+                'url': common.PLUGIN.get_url(
+                    module_path=params.module_path,
+                    module_name=params.module_name,
+                    action='start_live_tv_stream'
+                ),
+                'is_playable': is_playable,
+                'context_menu': context_menu,
+                'info': info,
+                'stream_info': stream_info,
+            })
 
     return common.PLUGIN.create_listing(
         listing,
