@@ -48,11 +48,9 @@ SKELETON = {
                 ('tf1-series-films', 'none')
             ],
 
-            ('be', 'build_live_tv_menu'): [
-                ('rtl_tvi', 'none'),
-                ('plug_rtl', 'none'),
-                ('club_rtl', 'none'),
-                ('contact', 'none')
+            ('uk', 'build_live_tv_menu'): [
+                ('questtv', 'none'),
+                ('questred', 'none')
             ]
         },
 
@@ -82,9 +80,13 @@ SKELETON = {
                 ('tmc', 'replay_entry'),
                 ('tfx', 'replay_entry'),
                 ('tf1-series-films', 'replay_entry'),
-                ('tfou', 'replay_entry'),
-                # ('francetvsport', 'replay_entry')
-            ]
+                ('tfou', 'replay_entry')
+            ],
+
+            # ('uk', 'generic_menu'): [
+            #     ('questod', 'replay_entry'),
+            #     ('questod', 'replay_entry')
+            # ]
 
         },
         ('websites', 'generic_menu'): [
@@ -131,7 +133,9 @@ CHANNELS = {
     'tfx': 'mytf1',
     'tf1-series-films': 'mytf1',
     'tfou': 'mytf1',
-    'francetvsport': 'francetvsport'
+    'questod': 'questod',
+    'questtv': 'questod',
+    'questred': 'questod'
 }
 
 '''
@@ -147,6 +151,7 @@ LABELS = {
     # Countries
     'be': 'Belgium',
     'fr': 'France',
+    'uk': 'United Kingdom',
 
     # Belgium channels / live TV
     'rtl_tvi': 'RTL-TVI',
@@ -173,7 +178,10 @@ LABELS = {
     'tfx': 'TFX',
     'tf1-series-films': 'TF1 Séries Films',
     'tfou': 'Tfou (MYTF1)',
-    'francetvsport': 'France TV Sport (francetv)'
 
+    # United Kingdom channels / live TV
+    'questod': 'Quest OD',
+    'questtv': 'Quest TV',
+    'questred': 'Quest RED',
 
 }

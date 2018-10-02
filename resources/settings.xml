@@ -31,6 +31,9 @@
 
         <setting label="30054" type="bool" id="be" default="true"/>
         <setting label="" type="number" visible="false" id="be.order" default="2"/>
+
+        <setting label="30052" type="bool" id="uk" default="true"/>
+        <setting label="" type="number" visible="false" id="uk.order" default="3"/>
     </category>
     <!-- Countries-->
 
@@ -89,9 +92,6 @@
 
             <setting label="Tfou (MYTF1)" type="bool" id="tfou" default="true" visible="eq(-29,true)"/>
             <setting label="" type="number" visible="false" id="tfou.order" default="15"/>
-
-            <setting label="France TV Sport (francetv)" type="bool" id="francetvsport" default="true" visible="eq(-31,true)"/>
-            <setting label="" type="number" visible="false" id="francetvsport.order" default="16"/>
         <!-- France -->
 
         <!-- Belgium -->
@@ -119,6 +119,20 @@
             <setting label="RTL Sport" type="bool" id="rtl_sport" default="true" visible="eq(-13,true)"/>
             <setting label="" type="number" visible="false" id="rtl_sport.order" default="7"/>
         <!-- Belgium -->
+
+        <!-- United Kingdom -->
+        <setting label="30084" type="lsep" subsetting="true" visible="eq(1,true)"/>
+        <setting label="" type="bool" id="uk" default="true" visible="false"/>
+
+            <setting label="Quest OD" type="bool" id="questod" default="true" visible="eq(-1,true)"/>
+            <setting label="" type="number" visible="false" id="questod.order" default="1"/>
+
+            <setting label="Quest TV" type="bool" id="questtv" default="true" visible="eq(-3,true)"/>
+            <setting label="" type="number" visible="false" id="questtv.order" default="2"/>
+
+            <setting label="Quest Red" type="bool" id="questred" default="true" visible="eq(-5,true)"/>
+            <setting label="" type="number" visible="false" id="questred.order" default="3"/>
+       <!-- United Kingdom -->
 
     </category>
     <!-- Channels -->

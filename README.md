@@ -9,6 +9,11 @@ Cette extension regroupe l'ensemble des vidéos des différents services et cha�
 *This plugin brings together all the videos of the various services and channels of catch-up TV. Furthermore, this addon allows you to quickly access the videos and content offered by certain websites. For testing DRM and working with Kodi 18*
 
 ## Chaînes disponibles — *Available channels*
+### Angleterre — *United Kingdom*
+##### TV
+- Quest TV *(Live TV) (DRM capabilities)*
+- Quest RED *(Live TV) (DRM capabilities)*
+
 ### Belgique — *Belgium*
 ##### TV Communauté française — *French Community TV*
 - RTL-TVI *(Replay) (DRM capabilities) (rtlplay account required)*
