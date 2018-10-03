@@ -314,6 +314,10 @@ def build_live_tv_menu(params):
 
             if len(re.compile(
                 r'drmToken\"\:\"(.*?)\"').findall(live_html)) > 0:
+
+                is_helper = inputstreamhelper.Helper('mpd', drm='widevine')
+                if not is_helper.check_inputstream():
+                    return False
                 token = re.compile(
                     r'drmToken\"\:\"(.*?)\"').findall(live_html)[0]
 

@@ -20,6 +20,7 @@
     Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
+import inputstreamhelper
 import ast
 import json
 import re
@@ -44,6 +45,9 @@ URL_STREAM = URL_ROOT + '/api/video-playback/%s'
 # path
 
 URL_LIVE = 'https://www.questod.co.uk/channel/%s'
+
+URL_LICENCE_KEY = 'https://lic.caas.conax.com/nep/wv/license|Content-Type=&User-Agent=Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3041.0 Safari/537.36&PreAuthorization=%s&Host=lic.caas.conax.com|R{SSM}|'
+# videoId
 
 SHOW_MODE = {
     'FEATURED': 'featured',
@@ -224,6 +228,10 @@ def list_videos(params):
             URL_VIDEOS % params.show_id)
         list_videos_jsonparser = json.loads(list_videos_json)
 
+        is_helper = inputstreamhelper.Helper('mpd', drm='widevine')
+        if not is_helper.check_inputstream():
+            return False
+
         if 'episode' in list_videos_jsonparser["videos"]:
             if params.show_season_id in list_videos_jsonparser["videos"]["episode"]:
                 for video_datas in list_videos_jsonparser["videos"]["episode"][params.show_season_id]:
@@ -234,6 +242,13 @@ def list_videos(params):
                     video_plot = video_datas["description"]
                     video_img = video_datas["image"]["src"]
                     video_id = video_datas["path"]
+
+                    video_datas_json = utils.get_webcontent(
+                        URL_STREAM % video_id)
+                    video_datas_jsonparser = json.loads(video_datas_json)
+                    token = ''
+                    if "drmToken" in video_datas_jsonparser["playback"]:
+                        token = video_datas_jsonparser["playback"]["drmToken"]
 
                     info = {
                         'video': {
@@ -258,21 +273,44 @@ def list_videos(params):
                     context_menu = []
                     context_menu.append(download_video)
 
-                    videos.append({
-                        'label': video_title,
-                        'thumb': video_img,
-                        'fanart': video_img,
-                        'url': common.PLUGIN.get_url(
-                            module_path=params.module_path,
-                            module_name=params.module_name,
-                            action='replay_entry',
-                            next='play_r',
-                            video_id=video_id
-                        ),
-                        'is_playable': True,
-                        'info': info,
-                        'context_menu': context_menu
-                    })
+                    if token == '':
+                        videos.append({
+                            'label': video_title,
+                            'thumb': video_img,
+                            'fanart': video_img,
+                            'url': common.PLUGIN.get_url(
+                                module_path=params.module_path,
+                                module_name=params.module_name,
+                                action='replay_entry',
+                                next='play_r',
+                                video_id=video_id
+                            ),
+                            'is_playable': True,
+                            'info': info,
+                            'context_menu': context_menu
+                        })
+                    else:
+                        videos.append({
+                            'label': video_title,
+                            'thumb': video_img,
+                            'fanart': video_img,
+                            'url': common.PLUGIN.get_url(
+                                module_path=params.module_path,
+                                module_name=params.module_name,
+                                action='replay_entry',
+                                next='play_r',
+                                video_id=video_id
+                            ),
+                            'is_playable': True,
+                            'info': info,
+                            'properties': {
+                                'inputstreamaddon': 'inputstream.adaptive',
+                                'inputstream.adaptive.manifest_type': 'mpd',
+                                'inputstream.adaptive.license_type': 'com.widevine.alpha',
+                                'inputstream.adaptive.license_key': URL_LICENCE_KEY % token
+                            },
+                            'context_menu': context_menu
+                        })
 
     return common.PLUGIN.create_listing(
         videos,
@@ -305,12 +343,10 @@ def get_video_url(params):
                 utils.send_notification(
                     common.ADDON.get_localized_string(30716))
             return None
-        if 'drmEnabled' in list_stream_jsonparser["playback"]:
-            if list_stream_jsonparser["playback"]["drmEnabled"]:
-                utils.send_notification(
-                    common.ADDON.get_localized_string(30702))
-                return None
-        return list_stream_jsonparser["playback"]["streamUrlHls"] + 'bw_start=800'
+        if "drmToken" in list_stream_jsonparser["playback"]:
+            return list_stream_jsonparser["playback"]["streamUrlDash"]
+        else:
+            return list_stream_jsonparser["playback"]["streamUrlHls"]
     elif params.next == 'play_l':
         live_html = ''
         if params.channel_name == 'questtv':

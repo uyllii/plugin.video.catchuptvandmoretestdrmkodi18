@@ -83,10 +83,10 @@ SKELETON = {
                 ('tfou', 'replay_entry')
             ],
 
-            # ('uk', 'generic_menu'): [
-            #     ('questod', 'replay_entry'),
-            #     ('questod', 'replay_entry')
-            # ]
+            ('uk', 'generic_menu'): [
+                ('questod', 'replay_entry'),
+                ('questod', 'replay_entry')
+            ]
 
         },
         ('websites', 'generic_menu'): [

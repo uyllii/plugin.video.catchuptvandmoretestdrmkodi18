@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="plugin.video.catchuptvandmoretestdrmkodi18"
        name="Catch-up TV &amp; More Test DRM Kodi 18"
-       version="0.0.1~beta11"
+       version="0.0.1~beta12"
        provider-name="SylvainCcchetto,wwark">
   <requires>
     <import addon="xbmc.python" version="2.25.0"/>
@@ -39,6 +39,7 @@
 [Improvements] Use inputstreamhelper to deploy lib of DRM (wwark)
 [DRM] Replay with DRM capabilites for MYTF1
 [Add Live TV DRM] Quest and Quest RED (UK) (wwark)
+[Add Channel DRM] Quest OD (UK) (wwark)
     </news>
     <assets>
       <icon>icon.png</icon>

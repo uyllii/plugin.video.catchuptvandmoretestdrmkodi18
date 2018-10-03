@@ -11,6 +11,7 @@ Cette extension regroupe l'ensemble des vidéos des différents services et cha�
 ## Chaînes disponibles — *Available channels*
 ### Angleterre — *United Kingdom*
 ##### TV
+- Quest OD *(Replay) (DRM capabilities)*
 - Quest TV *(Live TV) (DRM capabilities)*
 - Quest RED *(Live TV) (DRM capabilities)*
 
