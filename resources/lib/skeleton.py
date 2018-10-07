@@ -42,10 +42,10 @@ SKELETON = {
                 # ('teva', 'none'),
                 # ('parispremiere', 'none'),
                 ('mb', 'none'),
-                ('tf1', 'none'),
-                ('tmc', 'none'),
-                ('tfx', 'none'),
-                ('tf1-series-films', 'none')
+                # ('tf1', 'none'),
+                # ('tmc', 'none'),
+                # ('tfx', 'none'),
+                # ('tf1-series-films', 'none')
             ],
 
             ('uk', 'build_live_tv_menu'): [
