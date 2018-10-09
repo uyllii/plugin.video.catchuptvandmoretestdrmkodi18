@@ -210,8 +210,8 @@ def list_videos(plugin, item_id, program_id, program_season_number):
                 )
                 yield item
 
-def live_entry(plugin, item_id):
-    return get_live_url(plugin, item_id, item_id.upper(), LABELS[item_id], '', '')
+def live_entry(plugin, item_id, item_thumb):
+    return get_live_url(plugin, item_id, item_id.upper(), LABELS[item_id], '', item_thumb)
 
 @Resolver.register
 def get_video_url(plugin, item_id, video_id, video_title, video_plot, video_image):

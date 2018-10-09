@@ -118,7 +118,7 @@ def generic_menu(plugin, item_id, item_thumb):
 
 
 @Route.register
-def replay_bridge(plugin, item_id, item_module):
+def replay_bridge(plugin, item_id, item_thumb, item_module):
     """
     replay_bridge is the bridge between the
     addon.py file and each channel modules files.
@@ -136,7 +136,7 @@ def replay_bridge(plugin, item_id, item_module):
 
 
 @Route.register
-def website_bridge(plugin, item_id, item_module):
+def website_bridge(plugin, item_id,  item_thumb, item_module):
     """
     Like replay_bridge
     """
