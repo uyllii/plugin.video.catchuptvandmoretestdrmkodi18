@@ -23,76 +23,53 @@
 
     <!-- Countries-->
     <category label="30001">
-        <!-- Hide coutries -->
-        <setting label="30013" type="lsep"/>
+        <!-- Hide live TV countries -->
+        <setting label="30015" type="lsep"/>
 
-        <setting label="30050" type="bool" id="fr" default="true"/>
-        <setting label="" type="number" visible="false" id="fr.order" default="1"/>
+            <setting label="30050" type="bool" id="fr_live" default="true"/>
+            <setting label="" type="number" visible="false" id="fr_live.order" default="1"/>
 
-        <setting label="30054" type="bool" id="be" default="true"/>
-        <setting label="" type="number" visible="false" id="be.order" default="2"/>
+            <setting label="30052" type="bool" id="uk_live" default="true"/>
+            <setting label="" type="number" visible="false" id="uk_live.order" default="2"/>
 
-        <setting label="30052" type="bool" id="uk" default="true"/>
-        <setting label="" type="number" visible="false" id="uk.order" default="3"/>
+            <setting label="30054" type="bool" id="be_live" default="true"/>
+            <setting label="" type="number" visible="false" id="be_live.order" default="3"/>
+
+        <!-- Hide catch-up TV countries -->
+        <setting label="30016" type="lsep"/>
+
+            <setting label="30050" type="bool" id="fr_replay" default="true"/>
+            <setting label="" type="number" visible="false" id="fr_replay.order" default="1"/>
+
+            <setting label="30052" type="bool" id="uk_replay" default="true"/>
+            <setting label="" type="number" visible="false" id="uk_replay.order" default="2"/>
+
+            <setting label="30054" type="bool" id="be_replay" default="true"/>
+            <setting label="" type="number" visible="false" id="be_replay.order" default="3"/>
+
     </category>
     <!-- Countries-->
 
 
 
-    <!-- Channels -->     
+    <!-- Channels -->
     <category label="30006">
         <!-- Hide channels -->
         <setting label="30011" type="lsep"/>
 
-        <!-- France -->
-        <setting label="30080" type="lsep" subsetting="true" visible="eq(1,true)"/>
-        <setting label="" type="bool" id="fr" default="true" visible="false"/>
+        <!-- United Kingdom -->
+        <setting label="30084" type="lsep" subsetting="true" visible="eq(1,true)"/>
+        <setting label="" type="bool" id="uk" default="true" visible="false"/>
 
-            <setting label="M6" type="bool" id="m6" default="true" visible="eq(-1,true)"/>
-            <setting label="" type="number" visible="false" id="m6.order" default="1"/>
+            <setting label="Quest OD" type="bool" id="questod" default="true" visible="eq(-1,true)"/>
+            <setting label="" type="number" visible="false" id="questod.order" default="1"/>
 
-            <setting label="W9" type="bool" id="w9" default="true" visible="eq(-3,true)"/>
-            <setting label="" type="number" visible="false" id="w9.order" default="2"/>
+            <setting label="Quest TV" type="bool" id="questtv" default="true" visible="eq(-3,true)"/>
+            <setting label="" type="number" visible="false" id="questtv.order" default="2"/>
 
-            <setting label="6ter" type="bool" id="6ter" default="true" visible="eq(-5,true)"/>
-            <setting label="" type="number" visible="false" id="6ter.order" default="3"/>
-
-            <setting label="Stories (6play)" type="bool" id="stories" default="true" visible="eq(-7,true)"/>
-            <setting label="" type="number" visible="false" id="stories.order" default="4"/>
-
-            <setting label="Comic (6play)" type="bool" id="comedy" default="true" visible="eq(-9,true)"/>
-            <setting label="" type="number" visible="false" id="comedy.order" default="5"/>
-
-            <setting label="Fun Radio" type="bool" id="fun_radio" default="true" visible="eq(-11,true)"/>
-            <setting label="" type="number" visible="false" id="fun_radio.order" default="6"/>
-
-            <setting label="RTL 2" type="bool" id="rtl2" default="true" visible="eq(-13,true)"/>
-            <setting label="" type="number" visible="false" id="rtl2.order" default="7"/>
-
-            <setting label="Teva" type="bool" id="teva" default="true" visible="eq(-15,true)"/>
-            <setting label="" type="number" visible="false" id="teva.order" default="8"/>
-
-            <setting label="Paris Première" type="bool" id="parispremiere" default="true" visible="eq(-17,true)"/>
-            <setting label="" type="number" visible="false" id="parispremiere.order" default="9"/>
-
-            <setting label="M6 Boutique" type="bool" id="mb" default="true" visible="eq(-19,true)"/>
-            <setting label="" type="number" visible="false" id="mb.order" default="10"/>
-
-            <setting label="TF1" type="bool" id="tf1" default="true" visible="eq(-21,true)"/>
-            <setting label="" type="number" visible="false" id="tf1.order" default="11"/>
-
-            <setting label="TMC" type="bool" id="tmc" default="true" visible="eq(-23,true)"/>
-            <setting label="" type="number" visible="false" id="tmc.order" default="12"/>
-
-            <setting label="TFX" type="bool" id="tfx" default="true" visible="eq(-25,true)"/>
-            <setting label="" type="number" visible="false" id="tfx.order" default="13"/>
-
-            <setting label="TF1 Séries Films" type="bool" id="tf1-series-films" default="true" visible="eq(-27,true)"/>
-            <setting label="" type="number" visible="false" id="tf1-series-films.order" default="14"/>
-
-            <setting label="Tfou (MYTF1)" type="bool" id="tfou" default="true" visible="eq(-29,true)"/>
-            <setting label="" type="number" visible="false" id="tfou.order" default="15"/>
-        <!-- France -->
+            <setting label="Quest Red" type="bool" id="questred" default="true" visible="eq(-5,true)"/>
+            <setting label="" type="number" visible="false" id="questred.order" default="3"/>
+        <!-- United Kingdom -->
 
         <!-- Belgium -->
         <setting label="30081" type="lsep" subsetting="true" visible="eq(1,true)"/>
@@ -120,31 +97,65 @@
             <setting label="" type="number" visible="false" id="rtl_sport.order" default="7"/>
         <!-- Belgium -->
 
-        <!-- United Kingdom -->
-        <setting label="30084" type="lsep" subsetting="true" visible="eq(1,true)"/>
-        <setting label="" type="bool" id="uk" default="true" visible="false"/>
 
-            <setting label="Quest OD" type="bool" id="questod" default="true" visible="eq(-1,true)"/>
-            <setting label="" type="number" visible="false" id="questod.order" default="1"/>
+        <!-- France -->
+        <setting label="30080" type="lsep" subsetting="true" visible="eq(1,true)"/>
+        <setting label="" type="bool" id="fr" default="true" visible="false"/>
 
-            <setting label="Quest TV" type="bool" id="questtv" default="true" visible="eq(-3,true)"/>
-            <setting label="" type="number" visible="false" id="questtv.order" default="2"/>
+            <setting label="TF1" type="bool" id="tf1" default="true" visible="eq(-1,true)"/>
+            <setting label="" type="number" visible="false" id="tf1.order" default="1"/>
 
-            <setting label="Quest Red" type="bool" id="questred" default="true" visible="eq(-5,true)"/>
-            <setting label="" type="number" visible="false" id="questred.order" default="3"/>
-       <!-- United Kingdom -->
+            <setting label="M6" type="bool" id="m6" default="true" visible="eq(-3,true)"/>
+            <setting label="" type="number" visible="false" id="m6.order" default="2"/>
+
+            <setting label="W9" type="bool" id="w9" default="true" visible="eq(-5,true)"/>
+            <setting label="" type="number" visible="false" id="w9.order" default="3"/>
+
+            <setting label="TMC" type="bool" id="tmc" default="true" visible="eq(-7,true)"/>
+            <setting label="" type="number" visible="false" id="tmc.order" default="4"/>
+
+            <setting label="TFX" type="bool" id="tfx" default="true" visible="eq(-9,true)"/>
+            <setting label="" type="number" visible="false" id="tfx.order" default="5"/>
+
+            <setting label="TF1 Séries Films" type="bool" id="tf1-series-films" default="true" visible="eq(-11,true)"/>
+            <setting label="" type="number" visible="false" id="tf1-series-films.order" default="6"/>
+
+            <setting label="6ter" type="bool" id="6ter" default="true" visible="eq(-13,true)"/>
+            <setting label="" type="number" visible="false" id="6ter.order" default="7"/>
+
+            <setting label="Tfou (MYTF1)" type="bool" id="tfou" default="true" visible="eq(-15,true)"/>
+            <setting label="" type="number" visible="false" id="tfou.order" default="8"/>
+
+            <setting label="Stories (6play)" type="bool" id="stories" default="true" visible="eq(-17,true)"/>
+            <setting label="" type="number" visible="false" id="stories.order" default="9"/>
+
+            <setting label="Comic (6play)" type="bool" id="comedy" default="true" visible="eq(-19,true)"/>
+            <setting label="" type="number" visible="false" id="comedy.order" default="10"/>
+
+            <setting label="Fun Radio" type="bool" id="fun_radio" default="true" visible="eq(-21,true)"/>
+            <setting label="" type="number" visible="false" id="fun_radio.order" default="11"/>
+
+            <setting label="RTL 2" type="bool" id="rtl2" default="true" visible="eq(-23,true)"/>
+            <setting label="" type="number" visible="false" id="rtl2.order" default="12"/>
+
+            <setting label="M6 Boutique" type="bool" id="mb" default="true" visible="eq(-25,true)"/>
+            <setting label="" type="number" visible="false" id="mb.order" default="13"/>
+        <!-- France -->
 
     </category>
     <!-- Channels -->
 
-    <!-- Websites -->     
+
+
+
+    <!-- Websites -->
     <category label="30007">
         <!-- Hide websites -->
         <setting label="30014" type="lsep" visible="eq(1,true)"/>
         <setting label="" type="bool" id="websites" default="true" visible="false"/>
 
     </category>
-    <!-- Websites -->  
+    <!-- Websites -->
 
 
 
@@ -168,12 +179,12 @@
 
 
     <!-- Download -->
-    <category label="30003">
+    <!--<category label="30003">
         <setting label="30012" type="lsep"/>
         <setting label="30200" type="folder" id="dl_folder" source="" option="writeable"/>
         <setting label="30201" type="labelenum" id="dl_quality" visible="true" values="SD|720p|1080p|Highest available" default="Highest available"/>
         <setting label="30202" type="bool" id="dl_background" default="false" visible="true"/>
-    </category>
+    </category>-->
     <!-- Download -->
 
 
@@ -203,7 +214,7 @@
 
     <!-- OpenVPN -->
         <!-- OpenVPN -->
-    <category label="OpenVPN">
+    <!--<category label="OpenVPN">
         <setting label="30340" type="bool" id="vpn.hide" default="true"/>
         <setting label="30361" type="action" action="RunPlugin(plugin://plugin.video.catchuptvandmore/?action=vpn_entry&amp;from_settings=connectdisconnect)"  visible="eq(-1,true)"/>
         <setting label="30341" type="file" id="vpn.openvpnfilepath" default="/usr/bin/openvpn" visible="eq(-2,true)"/>
@@ -213,7 +224,7 @@
         <setting label="30345" type="bool" id="vpn.sudo" default="false" visible="eq(-6,true)"/>
         <setting label="30346" type="bool" id="vpn.sudopsw" default="false" enable="!eq(-1,false)" visible="eq(-7,true)"/>
 
-    </category>
+    </category>-->
     <!-- OpenVPN -->
 
 
@@ -221,10 +232,10 @@
 
 
     <!-- Advanced settings / Tools and other things to save -->
-    <category label="30005">
+    <!--<category label="30005">
         <setting label="30370" type="action" action="RunPlugin(plugin://plugin.video.catchuptvandmore/?action=clear_cache)"/>
         <setting label="" type="bool" id="show_hidden_items_information" default="true" visible="false"/>
-    </category>
+    </category>-->
     <!-- Advanced settings / Tools and other things to save -->
 
 

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
     Catch-up TV & More
+    Original work (C) JUL1EN094, SPM, SylvainCecchetto
     Copyright (C) 2016  SylvainCecchetto
 
     This file is part of Catch-up TV & More.
@@ -19,19 +20,22 @@
     with Catch-up TV & More; if not, write to the Free Software Foundation,
     Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
+from random import randint
 
-# The unicode_literals import only has
-# an effect on Python 2.
-# It makes string literals as unicode like in Python 3
-from __future__ import unicode_literals
+user_agents = [
+    'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36'
+    ' (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36',
+    'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.75.14'
+    ' (KHTML, like Gecko) Version/7.0.3 Safari/7046A194A',
+    'Opera/9.80 (X11; Linux i686; Ubuntu/14.10) Presto/2.12.388 Version/12.16',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_1) AppleWebKit/602.2.14'
+    ' (KHTML, like Gecko) Version/10.0.1 Safari/602.2.14',
+    'Mozilla/5.0 (Windows NT 6.1; WOW64) '
+    'AppleWebKit/537.36 (KHTML, like Gecko) '
+    'Chrome/55.0.2883.87 Safari/537.36'
+]
 
-import os
-from codequick.script import Script
-from codequick.utils import ensure_native_str
 
-
-def get_item_media_path(item_media_path):
-    full_path = os.path.join(
-        Script.get_info("path"), "resources", "media", *(item_media_path))
-    return ensure_native_str(full_path)
-
+def get_random_ua():
+    return user_agents[randint(0, len(user_agents) - 1)]

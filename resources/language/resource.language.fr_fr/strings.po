@@ -129,6 +129,10 @@ msgctxt "#30059"
 msgid "Spain"
 msgstr "Espagne"
 
+msgctxt "#30060"
+msgid "Tunisia"
+msgstr "Tunisie"
+
 # Channels (from 30080 to 30129)
 msgctxt "#30080"
 msgid "French channels"
@@ -169,6 +173,10 @@ msgstr "Chaînes polonaises"
 msgctxt "#30089"
 msgid "Spanish channels"
 msgstr "Chaînes espagnoles"
+
+msgctxt "#30090"
+msgid "Tunisia channels"
+msgstr "Chaînes tunisienne"
 
 # Websites (from 30130 to 30149)
 
@@ -290,12 +298,12 @@ msgid "6play Password"
 msgstr "Mot de passe 6play"
 
 msgctxt "#30246"
-msgid "RTLPlay Login"
-msgstr "Login RTLPlay"
+msgid "RTLplay Login"
+msgstr "Login RTLplay"
 
 msgctxt "#30247"
-msgid "RTLPlay Password"
-msgstr "Mot de passe RTLPlay"
+msgid "RTLplay Password"
+msgstr "Mot de passe RTLplay"
 
 # Reserved space for other tab/category in settins (from 30260 to 30339)
 
@@ -484,8 +492,8 @@ msgid "Authentication failed"
 msgstr "Echec de l'authentification"
 
 msgctxt "#30712"
-msgid "Paid video"
-msgstr "Vidéo payante"
+msgid "Video with an account needed"
+msgstr "Vidéo avec un compte requis"
 
 msgctxt "#30713"
 msgid "Geo-blocked video"

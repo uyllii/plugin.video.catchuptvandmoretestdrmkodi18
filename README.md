@@ -32,8 +32,6 @@ Cette extension regroupe l'ensemble des vidéos des différents services et cha�
 - 6ter *(Replay, Live TV) (DRM capabilities) (6play account required)*
 - Fun Radio *(Replay, Live TV) (DRM capabilities) (6play account required)*
 - RTL 2 *(Replay, Live TV) (DRM capabilities) (6play account required)*
-- Teva *(Replay) (DRM capabilities) (6play account required) (Paid video - purchase monthly)*
-- Paris Première *(Replay) (DRM capabilities) (6play account required) (Paid video - purchase monthly)*
 - M6 Boutique *(Live TV) (DRM capabilities) (6play account required)*
 - TF1 *(Replay) (DRM capabilities)*
 - TMC *(Replay) (DRM capabilities)*

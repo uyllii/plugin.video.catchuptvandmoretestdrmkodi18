@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="plugin.video.catchuptvandmoretestdrmkodi18"
        name="Catch-up TV &amp; More Test DRM Kodi 18"
-       version="0.0.1~beta13"
+       version="0.1.0~beta01"
        provider-name="SylvainCcchetto,wwark">
   <requires>
-    <import addon="xbmc.python" version="2.25.0"/>
+    <import addon="xbmc.python" version="2.26.0"/>
     <import addon="script.module.beautifulsoup4" version="4.3.2"/>
-    <import addon="script.module.requests" version="2.12.4"/>
     <import addon="script.module.youtube.dl" version="18.225.0"/>
     <import addon="script.module.inputstreamhelper" version="0.3.3"/>
+    <import addon="script.module.codequick" version="0.9.5"/>
   </requires>
   <extension point="xbmc.python.pluginsource" library="addon.py">
     <provides>video</provides>
   </extension>
   <extension point="xbmc.addon.metadata">
+    <reuselanguageinvoker>false</reuselanguageinvoker>
     <summary lang="fr_fr">Catch-Up TV &amp; More : Replay TV, Live TV et bien plus encore.</summary>
     <description lang="fr_fr">Catch-Up TV &amp; More regroupe dans un même plugin Kodi l'ensemble des vidéos des différents services et chaînes de Replay TV (rattrapage TV) ainsi que l'accès au direct. De plus, cette extension vous permet d'accéder rapidement aux vidéos et contenus proposés par certains sites internet.</description>
     <disclaimer lang="fr_fr">Retours de bugs, propositions d'améliorations ou d'ajout de contenus sont les bienvenue ! GitHub ou e-mail.</disclaimer>
@@ -22,7 +23,7 @@
     <disclaimer lang="en_gb">Bug reports, suggestions for improvements or content additions are welcome! GitHub or e-mail.</disclaimer>
     <description lang="he_il">ההרחבה מאפשרת לך להתעדכן בתוכן השידורים תוסף אחד של קודי מרכז את כל קטעי וידאו של שירותים שונים וערוצי תוכן משודר. בנוסף, תוספת זו מאפשרת לך לגשת במהירות לסרטונים ולתכנים המוצעים על ידי אתרים מסוימים.</description>
     <disclaimer lang="he_il">דוחות שגיאה, הצעות לשיפור או תוספות תוכן יתקבלו בברכה! ל-GitHub או אימייל.</disclaimer>
- 
+
     <language>fr</language>
     <platform>all</platform>
     <license>GNU GENERAL PUBLIC LICENSE. Version 2, June 1991</license>
@@ -31,15 +32,8 @@
     <email>catch.up.tv.and.more [AT] gmail [DOT] com</email>
     <source>https://github.com/Catch-up-TV-and-More/plugin.video.catchuptvandmoretestdrmkodi18</source>
     <news>
-[Version 0.0.1]
-[DRM] Replay with DRM capabilites for Group M6 (wwark and thanks peak3d)
-[Add/Remove Channels] Add RTL 2 / Remove Bruce, Crazy Kitchen, Home Time, Sixième Style (wwark)
-[Add Live TV] M6, W9, 6Ter, Fun Radio, RTL 2 and M6 Boutique (wwark)
-[Add Channel] Group RTL BE DRM capabilities (BE) (wwark)
-[Improvements] Use inputstreamhelper to deploy lib of DRM (wwark)
-[DRM] Replay with DRM capabilites for MYTF1
-[Add Live TV DRM] Quest and Quest RED (UK) (wwark)
-[Add Channel DRM] Quest OD (UK) (wwark)
+[Version 0.1.0]
+[Move] Codequick framework
     </news>
     <assets>
       <icon>icon.png</icon>
@@ -50,7 +44,5 @@
       <screenshot>resources/screenshots/screenshot-04.jpg</screenshot>
       <screenshot>resources/screenshots/screenshot-05.jpg</screenshot>
     </assets>
-    <!-- Add this properties fix new version of Kodi 18 and need to fix on simpleplugin ? -->
-    <reuselanguageinvoker>false</reuselanguageinvoker>
   </extension>
 </addon>

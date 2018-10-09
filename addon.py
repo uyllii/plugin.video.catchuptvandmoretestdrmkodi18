@@ -20,456 +20,158 @@
     Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
-from resources.lib import skeleton
+# The unicode_literals import only has
+# an effect on Python 2.
+# It makes string literals as unicode like in Python 3
+from __future__ import unicode_literals
+import importlib
+
+from codequick import Route, Resolver, Listitem, run, Script
+
+from resources.lib.skeleton import *
+from resources.lib.labels import *
 from resources.lib import common
-from resources.lib import vpn
-from resources.lib import utils
-from resources.lib.root.channels.fr import live_tv_fr
-from resources.lib.root.channels.be import live_tv_be
-from resources.lib.root.channels.uk import live_tv_uk
-
-@common.PLUGIN.action()
-def root(params):
-    # Download xmltv files in background
-    if common.PLUGIN.get_setting('fr'):
-        live_tv_fr.download_xmltv_in_background()
-    return generic_menu(params)
 
 
-@common.PLUGIN.action()
-def generic_menu(params):
+@Route.register
+def root(plugin):
+    """
+    root is the entry point
+    of Catch-up TV & More
+    """
+    # First menu to build is the root menu
+    # (see ROOT dictionnary in skeleton.py)
+    return generic_menu(plugin, 'ROOT')
+
+
+@Route.register
+def generic_menu(plugin, item_id):
     """
     Build a generic addon menu
     with all not hidden items
     """
-    current_skeleton = skeleton.SKELETON[('root', 'generic_menu')]
-    current_path = ['root']
 
-    if 'item_skeleton' in params:
-        current_skeleton = eval(params.item_skeleton)
-        current_path = eval(params.item_path)
+    # The current menu to build contains
+    # all the items present in the 'item_id'
+    # dictionnary of the skeleton.py file
+    current_menu = eval(item_id.upper())
 
-    # First we sort the current menu
+    # First, we have to sort the current menu
+    # according to each item order and we have
+    # to hide each disabled item
     menu = []
-    for value in current_skeleton:
-        item_id = value[0]
-        item_next = value[1]
-        # If menu item isn't disable
-        if common.PLUGIN.get_setting(item_id):
+    for item_id, item_infos in current_menu.items():
+
+        # If the item is enable
+        if plugin.setting.get_boolean(item_id):
+
             # Get order value in settings file
-            item_order = common.PLUGIN.get_setting(item_id + '.order')
+            item_order = plugin.setting.get_int(item_id + '.order')
 
-            # Get english item title in LABELS dict in skeleton file
-            # and check if this title has any translated version in strings.po
-            item_title = ''
-            try:
-                item_title = common.GETTEXT(skeleton.LABELS[item_id])
-            except Exception:
-                item_title = skeleton.LABELS[item_id]
+            item = (
+                item_order,
+                item_id,
+                item_infos
+            )
 
-            # Build step by step the module pathfile
-            item_path = list(current_path)
-            if item_id in skeleton.FOLDERS:
-                item_path.append(skeleton.FOLDERS[item_id])
-            else:
-                item_path.append(item_id)
-
-            item_skeleton = {}
-            try:
-                item_skeleton = current_skeleton[value]
-            except TypeError:
-                item_skeleton = {}
-
-            item = (item_order, item_id, item_title, item_path, item_next,
-                    item_skeleton)
             menu.append(item)
 
+    # We sort the menu according to the item_order values
     menu = sorted(menu, key=lambda x: x[0])
 
-    # If only one item is present, directly open this item
-    only_one_item = False
-    if len(menu) == 1:
-        only_one_item = True
-        item = menu[0]
-        item_id = item[1]
-        item_title = item[2]
-        item_path = item[3]
-        item_next = item[4]
-        item_skeleton = item[5]
+    for index, (item_order,
+                item_id,
+                item_infos
+                ) in enumerate(menu):
 
-        params['item_id'] = item_id
-        params['item_path'] = str(item_path)
-        params['item_skeleton'] = str(item_skeleton)
-        params['window_title'] = item_title
+        item = Listitem()
 
-        if item_next == 'generic_menu':
-            return generic_menu(params)
-        elif item_next == 'replay_entry':
-            return replay_entry(params)
-        elif item_next == 'build_live_tv_menu':
-            return build_live_tv_menu(params)
+        item.params['item_id'] = item_id
+
+        label = LABELS[item_id]
+        if isinstance(label, int):
+            item.label = plugin.localize(label)
         else:
-            only_one_item = False
+            item.label = label
 
-    if not only_one_item:
-        listing = []
-        for index, (item_order, item_id, item_title, item_path, item_next,
-                    item_skeleton) in enumerate(menu):
+        # Get item path of icon and fanart
+        if 'thumb' in item_infos:
+            item.art["thumb"] = common.get_item_media_path(
+                item_infos['thumb'])
 
-            # Build context menu (Move up, move down, ...)
-            context_menu = []
+        if 'fanart' in item_infos:
+            item.art["fanart"] = common.get_item_media_path(
+                item_infos['fanart'])
 
-            item_down = (
-                common.GETTEXT('Move down'),
-                'XBMC.RunPlugin(' + common.PLUGIN.get_url(
-                    action='move',
-                    direction='down',
-                    item_id_order=item_id + '.order',
-                    displayed_items=menu) + ')'
-            )
-            item_up = (
-                common.GETTEXT('Move up'),
-                'XBMC.RunPlugin(' + common.PLUGIN.get_url(
-                    action='move',
-                    direction='up',
-                    item_id_order=item_id + '.order',
-                    displayed_items=menu) + ')'
-            )
+        # If this item requires a module to work, get
+        # the module path to be loaded
+        if 'module' in item_infos:
+            item.params['item_module'] = item_infos['module']
 
-            if index == 0:
-                context_menu.append(item_down)
-            elif index == len(menu) - 1:
-                context_menu.append(item_up)
-            else:
-                context_menu.append(item_up)
-                context_menu.append(item_down)
+        # Get the next action to trigger if this
+        # item will be selected by the user
+        item.set_callback(eval(item_infos['callback']))
 
-            hide = (
-                common.GETTEXT('Hide'),
-                'XBMC.RunPlugin(' + common.PLUGIN.get_url(
-                    action='hide',
-                    item_id=item_id) + ')'
-            )
-            context_menu.append(hide)
-
-            context_menu.append(utils.vpn_context_menu_item())
-
-            item_path_media = list(current_path)
-            item_path_media.append(item_id)
-            media_item_path = common.sp.xbmc.translatePath(
-                common.sp.os.path.join(
-                    common.MEDIA_PATH,
-                    *(item_path_media)
-                )
-            )
-
-            media_item_path = media_item_path.decode(
-                "utf-8").encode(common.FILESYSTEM_CODING)
-
-            icon = media_item_path + '.png'
-            fanart = media_item_path + '_fanart.jpg'
-
-            listing.append({
-                'icon': icon,
-                'fanart': fanart,
-                'label': item_title,
-                'url': common.PLUGIN.get_url(
-                    action=item_next,
-                    item_id=item_id,
-                    item_path=str(item_path),
-                    item_skeleton=str(item_skeleton),
-                    window_title=item_title
-                ),
-                'context_menu': context_menu
-            })
-
-        return common.PLUGIN.create_listing(
-            listing,
-            sort_methods=(
-                common.sp.xbmcplugin.SORT_METHOD_UNSORTED,),
-            category=common.get_window_title(params)
-        )
+        yield item
 
 
-@common.PLUGIN.action()
-def replay_entry(params):
+@Route.register
+def replay_bridge(plugin, item_id, item_module):
     """
-    replay_entry is the bridge between the
-    simpleplegin behavior and each channel files
+    replay_bridge is the bridge between the
+    addon.py file and each channel modules files.
+    Because each time the user enter in a new
+    menu level the PLUGIN.run() function is
+    executed.
+    So we have to load on the fly the corresponding
+    module of the channel.
     """
-    if 'item_id' in params:
-        params['module_name'] = params.item_id  # w9
-        module_path = eval(params.item_path)
-        module_path.pop()
-        module_path.append(skeleton.CHANNELS[params.module_name])
+    plugin.setting['module_to_load'] = item_module
 
-        # ['root', 'channels', 'fr', '6play']
-        params['module_path'] = str(module_path)
-        params['next'] = 'replay_entry'
-
-    channel = utils.get_module(params)
-
-    # Legacy fix (il faudrait remplacer channel_name par
-    # module_name dans tous les .py des chaines)
-    params['channel_name'] = params.module_name
-
-    # Let's go to the channel python file ...
-    return channel.channel_entry(params)
+    # Let's go to the module file ...
+    item_module = importlib.import_module(item_module)
+    return item_module.replay_entry(plugin, item_id)
 
 
-@common.PLUGIN.action()
-def build_live_tv_menu(params):
+@Route.register
+def website_bridge(plugin, item_id, item_module):
     """
-    build_live_tv_menu asks each channel for current live TV
-    information and display the concatenation of this to Kodi
+    Like replay_bridge
     """
-    folder_path = eval(params.item_path)
+    plugin.setting['module_to_load'] = item_module
 
-    country = folder_path[-1]
-    if country == "fr":
-        return live_tv_fr.build_live_tv_menu(params)
-    elif country == "be":
-        return live_tv_be.build_live_tv_menu(params)
-    elif country == "uk":
-        return live_tv_uk.build_live_tv_menu(params)
-    else:
-
-        # First we sort channels
-        menu = []
-        for channel in eval(params.item_skeleton):
-            channel_name = channel[0]
-            # If channel isn't disable
-            if common.PLUGIN.get_setting(channel_name):
-                # Get order value in settings file
-                channel_order = common.PLUGIN.get_setting(
-                    channel_name + '.order')
-                channel_path = list(folder_path)
-                channel_path.append(skeleton.CHANNELS[channel_name])
-
-                item = (channel_order, channel_name, channel_path)
-                menu.append(item)
-
-        menu = sorted(menu, key=lambda x: x[0])
-
-        listing = []
-        for index, (channel_order, channel_name, channel_path) in \
-                enumerate(menu):
-            params['module_path'] = str(channel_path)
-            params['module_name'] = channel_name
-            params['channel_label'] = skeleton.LABELS[channel_name]
-
-            channel = utils.get_module(params)
-
-            # Legacy fix (il faudrait remplacer channel_name par
-            # module_name dans tous les .py des chaines)
-            params['channel_name'] = params.module_name
-
-            item = {}
-            # Build context menu (Move up, move down, ...)
-            context_menu = []
-
-            item_down = (
-                common.GETTEXT('Move down'),
-                'XBMC.RunPlugin(' + common.PLUGIN.get_url(
-                    action='move',
-                    direction='down',
-                    item_id_order=channel_name + '.order',
-                    displayed_items=menu) + ')'
-            )
-            item_up = (
-                common.GETTEXT('Move up'),
-                'XBMC.RunPlugin(' + common.PLUGIN.get_url(
-                    action='move',
-                    direction='up',
-                    item_id_order=channel_name + '.order',
-                    displayed_items=menu) + ')'
-            )
-
-            if index == 0:
-                context_menu.append(item_down)
-            elif index == len(menu) - 1:
-                context_menu.append(item_up)
-            else:
-                context_menu.append(item_up)
-                context_menu.append(item_down)
-
-            hide = (
-                common.GETTEXT('Hide'),
-                'XBMC.RunPlugin(' + common.PLUGIN.get_url(
-                    action='hide',
-                    item_id=channel_name) + ')'
-            )
-            context_menu.append(hide)
-
-            context_menu.append(utils.vpn_context_menu_item())
-
-            try:
-                item = channel.get_live_item(params)
-                if item is not None:
-                    if type(item) is dict:
-                        item['context_menu'] = context_menu
-                        listing.append(item)
-                    elif type(item) is list:
-                        for subitem in item:
-                            subitem['context_menu'] = context_menu
-                            listing.append(subitem)
-            except Exception:
-                title = params['channel_label'] + ' broken'
-                utils.send_notification(
-                    '', title=title, time=2000)
-
-        return common.PLUGIN.create_listing(
-            listing,
-            sort_methods=(
-                common.sp.xbmcplugin.SORT_METHOD_UNSORTED,
-                common.sp.xbmcplugin.SORT_METHOD_LABEL
-            ),
-            category=common.get_window_title(params)
-        )
+    # Let's go to the module file ...
+    item_module = importlib.import_module(item_module)
+    return item_module.website_entry(plugin, item_id)
 
 
-@common.PLUGIN.action()
-def start_live_tv_stream(params):
+@Resolver.register
+def live_bridge(plugin, item_id, item_module):
     """
-    Once the user chooses a Live TV channel
-    start_live_tv_stream does the bridge in the channel file
-    to load the streaming media
+    Like replay_bridge
     """
+    plugin.setting['module_to_load'] = item_module
 
-    # Legacy fix (il faudrait remplacer channel_name par
-    # module_name dans tous les .py des chaines)
-    params['channel_name'] = params.module_name
-
-    channel = utils.get_module(params)
-
-    # Fix tempo pour le XMLTV de France
-    if "'fr'," in params.module_path:
-        return channel.start_live_tv_stream(params)
-    elif "'be'," in params.module_path:
-        return channel.start_live_tv_stream(params)
-    elif "'uk'," in params.module_path:
-        return channel.start_live_tv_stream(params)
-    else:
-        return channel.get_video_url(params)
+    # Let's go to the module file ...
+    item_module = importlib.import_module(item_module)
+    return item_module.live_entry(plugin, item_id)
 
 
-@common.PLUGIN.action()
-def website_entry(params):
+def main():
     """
-    website_entry is the bridge between the
-    simpleplegin behavior and each webiste files
+    Before running the plugin we need
+    to check if there is any module
+    to load on the fly
     """
-    if 'item_id' in params:
-        params['module_name'] = params.item_id
-        params['module_path'] = params.item_path
-        params['next'] = 'root'
-
-    website = utils.get_module(params)
-
-    # Let's go to the website python file ...
-    return website.website_entry(params)
-
-
-@common.PLUGIN.action()
-def move(params):
-    if params.direction == 'down':
-        offset = + 1
-    elif params.direction == 'up':
-        offset = - 1
-
-    for k in range(0, len(params.displayed_items)):
-        item = eval(params.displayed_items[k])
-        item_order = item[0]
-        item_id = item[1]
-        if item_id + '.order' == params.item_id_order:
-            item_swaped = eval(params.displayed_items[k + offset])
-            item_swaped_order = item_swaped[0]
-            item_swaped_id = item_swaped[1]
-            common.PLUGIN.set_setting(
-                params.item_id_order,
-                item_swaped_order)
-            common.PLUGIN.set_setting(
-                item_swaped_id + '.order',
-                item_order)
-            common.sp.xbmc.executebuiltin('XBMC.Container.Refresh()')
-            return None
-
-
-@common.PLUGIN.action()
-def hide(params):
-    if common.PLUGIN.get_setting('show_hidden_items_information'):
-        common.sp.xbmcgui.Dialog().ok(
-            common.GETTEXT('Information'),
-            common.GETTEXT(
-                'To re-enable hidden items go to the plugin settings'))
-        common.PLUGIN.set_setting('show_hidden_items_information', False)
-
-    common.PLUGIN.set_setting(params.item_id, False)
-    common.sp.xbmc.executebuiltin('XBMC.Container.Refresh()')
-    return None
-
-
-@common.PLUGIN.action()
-def download_video(params):
-    # Here we only have the webpage link of the video
-    # We have to call get_video_url function from the module
-    # to get the final video URL
-    params['next'] = 'replay_entry'
-
-    # Legacy fix (il faudrait remplacer channel_name par
-    # module_name dans tous les .py des chaines)
-    params['channel_name'] = params.module_name
-
-    channel = utils.get_module(params)
-
-    params['next'] = 'download_video'
-    url_video = channel.get_video_url(params)
-
-    #  Now that we have video URL we can try to download this one
-    YDStreamUtils = __import__('YDStreamUtils')
-    YDStreamExtractor = __import__('YDStreamExtractor')
-
-    quality_string = {
-        'SD': 0,
-        '720p': 1,
-        '1080p': 2,
-        'Highest available': 3
-    }
-
-    vid = YDStreamExtractor.getVideoInfo(
-        url_video,
-        quality=quality_string[common.PLUGIN.get_setting('dl_quality')],
-        resolve_redirects=True
-    )
-
-    path = common.PLUGIN.get_setting('dl_folder')
-    path = path.decode(
-        "utf-8").encode(common.FILESYSTEM_CODING)
-
-    with YDStreamUtils.DownloadProgress() as prog:
+    module_to_load = Script.setting['module_to_load']
+    if module_to_load != '':
         try:
-            YDStreamExtractor.setOutputCallback(prog)
-            YDStreamExtractor.handleDownload(
-                vid,
-                bg=common.PLUGIN.get_setting('dl_background'),
-                path=path
-            )
-        finally:
-            YDStreamExtractor.setOutputCallback(None)
-    return None
+            importlib.import_module(module_to_load)
+        except Exception:
+            pass
 
-
-@common.PLUGIN.action()
-def vpn_entry(params):
-    vpn.root(params)
-    return None
-
-
-@common.PLUGIN.action()
-def clear_cache():
-    utils.clear_cache()
-    return None
+    run()
 
 
 if __name__ == '__main__':
-    common.PLUGIN.run()
+    main()
