@@ -41,11 +41,11 @@ def root(plugin):
     """
     # First menu to build is the root menu
     # (see ROOT dictionnary in skeleton.py)
-    return generic_menu(plugin, 'ROOT')
+    return generic_menu(plugin, 'ROOT', '')
 
 
 @Route.register
-def generic_menu(plugin, item_id):
+def generic_menu(plugin, item_id, item_thumb):
     """
     Build a generic addon menu
     with all not hidden items
@@ -95,9 +95,11 @@ def generic_menu(plugin, item_id):
             item.label = label
 
         # Get item path of icon and fanart
+        item.params['item_thumb'] = ''
         if 'thumb' in item_infos:
             item.art["thumb"] = common.get_item_media_path(
                 item_infos['thumb'])
+            item.params['item_thumb'] = item.art["thumb"]
 
         if 'fanart' in item_infos:
             item.art["fanart"] = common.get_item_media_path(
@@ -146,7 +148,7 @@ def website_bridge(plugin, item_id, item_module):
 
 
 @Resolver.register
-def live_bridge(plugin, item_id, item_module):
+def live_bridge(plugin, item_id, item_thumb, item_module):
     """
     Like replay_bridge
     """
@@ -154,7 +156,7 @@ def live_bridge(plugin, item_id, item_module):
 
     # Let's go to the module file ...
     item_module = importlib.import_module(item_module)
-    return item_module.live_entry(plugin, item_id)
+    return item_module.live_entry(plugin, item_id, item_thumb)
 
 
 def main():

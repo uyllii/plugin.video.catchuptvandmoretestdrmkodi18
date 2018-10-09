@@ -284,8 +284,8 @@ def list_videos(plugin, item_id, program_id, sub_category_id):
         yield item
 
 
-def live_entry(plugin, item_id):
-    return get_live_url(plugin, item_id, item_id.upper(), LABELS[item_id], '', '')
+def live_entry(plugin, item_id, item_thumb):
+    return get_live_url(plugin, item_id, item_id.upper(), LABELS[item_id], '', item_thumb)
 
 
 @Resolver.register
@@ -502,7 +502,7 @@ def get_live_url(plugin, item_id, video_id, title_value, plot_value, img_value):
                 URL_LIVE_JSON % (item_id.upper()),
                 headers={'User-Agent': web_utils.get_random_ua}, max_age=-1)
             json_parser = json.loads(video_json.text)
-            video_assets = json_parser[item_id.upper()][0]['live']['assets'] 
+            video_assets = json_parser[item_id.upper()][0]['live']['assets']
 
         if video_assets is None:
             plugin.notify('ERROR', plugin.localize(30712))
