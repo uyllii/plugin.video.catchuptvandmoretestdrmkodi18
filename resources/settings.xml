@@ -171,6 +171,8 @@
 
         <!-- Content -->
         <setting label="30152" type="lsep" />
+            <setting label="30168" type="bool" id="tv_guide" default="true"/>
+
 
     </category>
     <!-- Quality and Content -->

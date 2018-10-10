@@ -24,6 +24,7 @@
 # an effect on Python 2.
 # It makes string literals as unicode like in Python 3
 from __future__ import unicode_literals
+from codequick import Script
 
 
 """
@@ -54,7 +55,7 @@ ROOT = {
 
 LIVE_TV = {
     'fr_live': {
-        'callback': 'generic_menu',
+        'callback': 'tv_guide_menu' if Script.setting.get_boolean('tv_guide') else 'generic_menu',
         'thumb': ['channels', 'fr.png']
     },
     'uk_live': {
