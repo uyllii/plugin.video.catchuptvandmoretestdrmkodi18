@@ -33,6 +33,36 @@ from resources.lib.labels import *
 from resources.lib import common
 
 
+def get_sorted_menu(item_id):
+    # The current menu to build contains
+    # all the items present in the 'item_id'
+    # dictionnary of the skeleton.py file
+    current_menu = eval(item_id.upper())
+
+    # First, we have to sort the current menu
+    # according to each item order and we have
+    # to hide each disabled item
+    menu = []
+    for item_id, item_infos in current_menu.items():
+
+        # If the item is enable
+        if Script.setting.get_boolean(item_id):
+
+            # Get order value in settings file
+            item_order = Script.setting.get_int(item_id + '.order')
+
+            item = (
+                item_order,
+                item_id,
+                item_infos
+            )
+
+            menu.append(item)
+
+    # We sort the menu according to the item_order values
+    return sorted(menu, key=lambda x: x[0])
+
+
 @Route.register
 def root(plugin):
     """
@@ -50,34 +80,7 @@ def generic_menu(plugin, item_id, item_thumb):
     Build a generic addon menu
     with all not hidden items
     """
-
-    # The current menu to build contains
-    # all the items present in the 'item_id'
-    # dictionnary of the skeleton.py file
-    current_menu = eval(item_id.upper())
-
-    # First, we have to sort the current menu
-    # according to each item order and we have
-    # to hide each disabled item
-    menu = []
-    for item_id, item_infos in current_menu.items():
-
-        # If the item is enable
-        if plugin.setting.get_boolean(item_id):
-
-            # Get order value in settings file
-            item_order = plugin.setting.get_int(item_id + '.order')
-
-            item = (
-                item_order,
-                item_id,
-                item_infos
-            )
-
-            menu.append(item)
-
-    # We sort the menu according to the item_order values
-    menu = sorted(menu, key=lambda x: x[0])
+    menu = get_sorted_menu(item_id)
 
     for index, (item_order,
                 item_id,
@@ -118,6 +121,104 @@ def generic_menu(plugin, item_id, item_thumb):
 
 
 @Route.register
+def tv_guide_menu(plugin, item_id, item_thumb):
+    menu = get_sorted_menu(item_id)
+    channels_id = []
+    for index, (channel_order,
+                channel_id,
+                channel_infos
+                ) in enumerate(menu):
+        channels_id.append(channel_id)
+
+    print('ITEM_ID: ' + item_id)
+    tv_guide_module_path = 'resources.lib.channels.tv_guides.' + item_id
+    print(tv_guide_module_path)
+    tv_guide_module = importlib.import_module(tv_guide_module_path)
+    tv_guide = tv_guide_module.grab_tv_guide(channels_id)
+
+    for index, (item_order,
+                item_id,
+                item_infos
+                ) in enumerate(menu):
+
+        item = Listitem()
+
+        item.params['item_id'] = item_id
+
+        label = LABELS[item_id]
+        if isinstance(label, int):
+            item.label = '[COLOR blue]' + plugin.localize(label) + '[/COLOR]'
+        else:
+            item.label = '[COLOR blue]' + label + '[/COLOR]'
+
+        # Get item path of icon and fanart
+        item.params['item_thumb'] = ''
+        if 'thumb' in item_infos:
+            item.art["thumb"] = common.get_item_media_path(
+                item_infos['thumb'])
+            item.params['item_thumb'] = item.art["thumb"]
+
+        if 'fanart' in item_infos:
+            item.art["fanart"] = common.get_item_media_path(
+                item_infos['fanart'])
+
+        # If this item requires a module to work, get
+        # the module path to be loaded
+        if 'module' in item_infos:
+            item.params['item_module'] = item_infos['module']
+
+        if item_id in tv_guide:
+            channel_infos = tv_guide[item_id]
+
+            if 'title' in channel_infos:
+                item.label = item.label + ' - [I]' + channel_infos['title'] + '[/I]'
+
+            if 'originaltitle' in channel_infos:
+                item.info['originaltitle'] = channel_infos['originaltitle']
+
+            if 'genre' in channel_infos:
+                item.info['genre'] = channel_infos['genre']
+
+            plot = ''
+            if 'soustitre' in channel_infos:
+                plot = channel_infos['soustitre']
+
+            if 'plot' in channel_infos:
+                plot = plot + '\n' + channel_infos['plot']
+            item.info['plot'] = plot
+
+            if 'director' in channel_infos:
+                item.info['director'] = channel_infos['director']
+
+            if 'cast' in channel_infos:
+                item.info['cast'] = channel_infos['cast']
+
+            if 'writer' in channel_infos:
+                item.info['writer'] = channel_infos['writer']
+
+            if 'year' in channel_infos:
+                item.info['year'] = channel_infos['year']
+
+            if 'episode' in channel_infos:
+                item.info['episode'] = channel_infos['episode']
+
+            if 'season' in channel_infos:
+                item.info['season'] = channel_infos['season']
+
+            if 'image' in channel_infos:
+                item.art["fanart"] = channel_infos['image']
+
+            if 'rating' in channel_infos:
+                item.info["rating"] = channel_infos['rating']
+
+        # Get the next action to trigger if this
+        # item will be selected by the user
+        item.set_callback(eval(item_infos['callback']))
+
+        yield item
+
+
+@Route.register
 def replay_bridge(plugin, item_id, item_thumb, item_module):
     """
     replay_bridge is the bridge between the
@@ -136,7 +237,7 @@ def replay_bridge(plugin, item_id, item_thumb, item_module):
 
 
 @Route.register
-def website_bridge(plugin, item_id,  item_thumb, item_module):
+def website_bridge(plugin, item_id, item_thumb, item_module):
     """
     Like replay_bridge
     """

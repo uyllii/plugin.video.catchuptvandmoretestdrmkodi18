@@ -255,6 +255,10 @@ msgctxt "#30167"
 msgid "TVP 3: Choose region"
 msgstr ""
 
+msgctxt "#30168"
+msgid "Enable TV guide (slower)"
+msgstr ""
+
 # Download (from 30200 to 30239)
 
 msgctxt "#30200"
