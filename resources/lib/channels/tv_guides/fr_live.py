@@ -837,4 +837,3 @@ if __name__ == '__main__':
     channels = ['france2', 'm6', 'w9', 'test_channel_no_present']
 
     programs = grab_tv_guide(channels)
-

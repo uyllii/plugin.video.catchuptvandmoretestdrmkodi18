@@ -148,10 +148,9 @@ def tv_guide_menu(plugin, item_id, item_thumb):
 
         label = LABELS[item_id]
         if isinstance(label, int):
-            item.label = plugin.localize(label)
+            item.label = '[COLOR blue]' + plugin.localize(label) + '[/COLOR]'
         else:
-            item.label = label
-        item.label = utils.color(item.label, 'blue')
+            item.label = '[COLOR blue]' + label + '[/COLOR]'
 
         # Get item path of icon and fanart
         item.params['item_thumb'] = ''
@@ -169,12 +168,11 @@ def tv_guide_menu(plugin, item_id, item_thumb):
         if 'module' in item_infos:
             item.params['item_module'] = item_infos['module']
 
-        # If we have program infos from the grabber
         if item_id in tv_guide:
             channel_infos = tv_guide[item_id]
 
             if 'title' in channel_infos:
-                item.label = item.label + ' — ' + utils.italic(channel_infos['title'])
+                item.label = item.label + ' - [I]' + channel_infos['title'] + '[/I]'
 
             if 'originaltitle' in channel_infos:
                 item.info['originaltitle'] = channel_infos['originaltitle']
