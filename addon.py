@@ -27,6 +27,7 @@ from __future__ import unicode_literals
 import importlib
 
 from codequick import Route, Resolver, Listitem, run, Script, utils
+import xbmcplugin
 
 from resources.lib.skeleton import *
 from resources.lib.labels import *
@@ -122,6 +123,8 @@ def generic_menu(plugin, item_id, item_thumb):
 
 @Route.register
 def tv_guide_menu(plugin, item_id, item_thumb):
+    plugin.add_sort_methods(xbmcplugin.SORT_METHOD_UNSORTED)
+
     menu = get_sorted_menu(item_id)
     channels_id = []
     for index, (channel_order,
