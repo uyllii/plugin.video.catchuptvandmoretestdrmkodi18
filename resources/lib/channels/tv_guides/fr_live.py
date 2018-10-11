@@ -800,28 +800,38 @@ class TeleramaXMLTVGrabber:
         current_time = datetime.datetime.now().replace(
             tzinfo=pytz.reference.LocalTimezone())
         # print('CURRENT_TIME: ' + str(current_time))
+        days = 1
+        # Dates to fetch from the Télérama API
+        telerama_fetch_dates = [today.date() + datetime.timedelta(days=d) for d in range(days)]
+        # Télérama data for a given day contain programs starting between 6:00 AM and 6:00 AM the
+        # next day (Paris time)
+        if current_time < self._TELERAMA_TIMEZONE.localize(
+                datetime.datetime.combine(current_time, self._TELERAMA_START_TIME)
+        ):
+            telerama_fetch_dates.insert(0, current_time.date() - datetime.timedelta(days=1))
 
         programs = {}
-        for program in self._get_programs(channels, today):
+        for date in telerama_fetch_dates:
+            for program in self._get_programs(channels, date):
 
-            try:
-                program_start_0 = datetime.datetime.strptime(program['horaire']['debut'], self._TELERAMA_TIME_FORMAT)
-            except TypeError:
-                program_start_0 = datetime.datetime(*(time.strptime(program['horaire']['debut'], self._TELERAMA_TIME_FORMAT)[0:6]))
+                try:
+                    program_start_0 = datetime.datetime.strptime(program['horaire']['debut'], self._TELERAMA_TIME_FORMAT)
+                except TypeError:
+                    program_start_0 = datetime.datetime(*(time.strptime(program['horaire']['debut'], self._TELERAMA_TIME_FORMAT)[0:6]))
 
-            program_start = self._TELERAMA_TIMEZONE.localize(program_start_0)
+                program_start = self._TELERAMA_TIMEZONE.localize(program_start_0)
 
-            try:
-                program_stop_0 = datetime.datetime.strptime(program['horaire']['fin'], self._TELERAMA_TIME_FORMAT)
-            except TypeError:
-                program_stop_0 = datetime.datetime(*(time.strptime(program['horaire']['fin'], self._TELERAMA_TIME_FORMAT)[0:6]))
+                try:
+                    program_stop_0 = datetime.datetime.strptime(program['horaire']['fin'], self._TELERAMA_TIME_FORMAT)
+                except TypeError:
+                    program_stop_0 = datetime.datetime(*(time.strptime(program['horaire']['fin'], self._TELERAMA_TIME_FORMAT)[0:6]))
 
-            program_stop = self._TELERAMA_TIMEZONE.localize(program_stop_0)
+                program_stop = self._TELERAMA_TIMEZONE.localize(program_stop_0)
 
-            # Keep only current program
-            if program_start <= current_time and program_stop >= current_time:
-                program_dict = self._parse_program_dict(program)
-                programs[ID_CHANNELS[program_dict['id_chaine']]] = program_dict
+                # Keep only current program
+                if program_start <= current_time and program_stop >= current_time:
+                    program_dict = self._parse_program_dict(program)
+                    programs[ID_CHANNELS[program_dict['id_chaine']]] = program_dict
 
         return programs
 
@@ -837,3 +847,4 @@ if __name__ == '__main__':
     channels = ['france2', 'm6', 'w9', 'test_channel_no_present']
 
     programs = grab_tv_guide(channels)
+    print(str(programs))

@@ -72,15 +72,16 @@ def root(plugin):
     """
     # First menu to build is the root menu
     # (see ROOT dictionnary in skeleton.py)
-    return generic_menu(plugin, 'ROOT', '')
+    return generic_menu(plugin, 'ROOT')
 
 
 @Route.register
-def generic_menu(plugin, item_id, item_thumb):
+def generic_menu(plugin, item_id, item_art=None):
     """
     Build a generic addon menu
     with all not hidden items
     """
+    plugin.add_sort_methods(xbmcplugin.SORT_METHOD_UNSORTED)
     menu = get_sorted_menu(item_id)
 
     for index, (item_order,
@@ -88,41 +89,44 @@ def generic_menu(plugin, item_id, item_thumb):
                 item_infos
                 ) in enumerate(menu):
 
-        item = Listitem()
-
-        item.params['item_id'] = item_id
+        item_art = {}
 
         label = LABELS[item_id]
         if isinstance(label, int):
-            item.label = plugin.localize(label)
-        else:
-            item.label = label
+            label = plugin.localize(label)
 
         # Get item path of icon and fanart
-        item.params['item_thumb'] = ''
         if 'thumb' in item_infos:
-            item.art["thumb"] = common.get_item_media_path(
+            item_art["thumb"] = common.get_item_media_path(
                 item_infos['thumb'])
-            item.params['item_thumb'] = item.art["thumb"]
 
         if 'fanart' in item_infos:
-            item.art["fanart"] = common.get_item_media_path(
+            item_art["fanart"] = common.get_item_media_path(
                 item_infos['fanart'])
+
+        item_params = {
+            'item_id': item_id,
+            'item_art': item_art
+        }
+
+        # Get the next action to trigger if this
+        # item will be selected by the user
+        item = Listitem().from_dict(
+            eval(item_infos['callback']),
+            label,
+            art=item_art,
+            params=item_params)
 
         # If this item requires a module to work, get
         # the module path to be loaded
         if 'module' in item_infos:
             item.params['item_module'] = item_infos['module']
 
-        # Get the next action to trigger if this
-        # item will be selected by the user
-        item.set_callback(eval(item_infos['callback']))
-
         yield item
 
 
 @Route.register
-def tv_guide_menu(plugin, item_id, item_thumb):
+def tv_guide_menu(plugin, item_id, item_art=None):
     plugin.add_sort_methods(xbmcplugin.SORT_METHOD_UNSORTED)
 
     menu = get_sorted_menu(item_id)
@@ -145,45 +149,35 @@ def tv_guide_menu(plugin, item_id, item_thumb):
                 item_infos
                 ) in enumerate(menu):
 
-        item = Listitem()
-
-        item.params['item_id'] = item_id
-
         label = LABELS[item_id]
         if isinstance(label, int):
-            item.label = plugin.localize(label)
-        else:
-            item.label = label
-        item.label = utils.color(item.label, 'blue')
+            label = plugin.localize(label)
+        label = utils.color(label, 'blue')
+
+        item_art = {}
+        item_info = {}
 
         # Get item path of icon and fanart
-        item.params['item_thumb'] = ''
         if 'thumb' in item_infos:
-            item.art["thumb"] = common.get_item_media_path(
+            item_art["thumb"] = common.get_item_media_path(
                 item_infos['thumb'])
-            item.params['item_thumb'] = item.art["thumb"]
 
         if 'fanart' in item_infos:
-            item.art["fanart"] = common.get_item_media_path(
+            item_art["fanart"] = common.get_item_media_path(
                 item_infos['fanart'])
-
-        # If this item requires a module to work, get
-        # the module path to be loaded
-        if 'module' in item_infos:
-            item.params['item_module'] = item_infos['module']
 
         # If we have program infos from the grabber
         if item_id in tv_guide:
             channel_infos = tv_guide[item_id]
 
             if 'title' in channel_infos:
-                item.label = item.label + ' — ' + utils.italic(channel_infos['title'])
+                label = label + ' — ' + utils.italic(channel_infos['title'])
 
             if 'originaltitle' in channel_infos:
-                item.info['originaltitle'] = channel_infos['originaltitle']
+                item_info['originaltitle'] = channel_infos['originaltitle']
 
             if 'genre' in channel_infos:
-                item.info['genre'] = channel_infos['genre']
+                item_info['genre'] = channel_infos['genre']
 
             plot = ''
             if 'soustitre' in channel_infos:
@@ -191,41 +185,55 @@ def tv_guide_menu(plugin, item_id, item_thumb):
 
             if 'plot' in channel_infos:
                 plot = plot + '\n' + channel_infos['plot']
-            item.info['plot'] = plot
+            item_info['plot'] = plot
 
             if 'director' in channel_infos:
-                item.info['director'] = channel_infos['director']
+                item_info['director'] = channel_infos['director']
 
             if 'cast' in channel_infos:
-                item.info['cast'] = channel_infos['cast']
+                item_info['cast'] = channel_infos['cast']
 
             if 'writer' in channel_infos:
-                item.info['writer'] = channel_infos['writer']
+                item_info['writer'] = channel_infos['writer']
 
             if 'year' in channel_infos:
-                item.info['year'] = channel_infos['year']
+                item_info['year'] = channel_infos['year']
 
             if 'episode' in channel_infos:
-                item.info['episode'] = channel_infos['episode']
+                item_info['episode'] = channel_infos['episode']
 
             if 'season' in channel_infos:
-                item.info['season'] = channel_infos['season']
+                item_info['season'] = channel_infos['season']
 
             if 'image' in channel_infos:
-                item.art["fanart"] = channel_infos['image']
+                item_art["fanart"] = channel_infos['image']
 
             if 'rating' in channel_infos:
-                item.info["rating"] = channel_infos['rating']
+                item_info["rating"] = channel_infos['rating']
 
-        # Get the next action to trigger if this
-        # item will be selected by the user
-        item.set_callback(eval(item_infos['callback']))
+        item_params = {
+            'item_id': item_id,
+            'item_info': item_info,
+            'item_art': item_art
+        }
+
+        # If this item requires a module to work, get
+        # the module path to be loaded
+        if 'module' in item_infos:
+            item_params['item_module'] = item_infos['module']
+
+        item = Listitem().from_dict(
+            eval(item_infos['callback']),
+            label,
+            art=item_art,
+            info=item_info,
+            params=item_params)
 
         yield item
 
 
 @Route.register
-def replay_bridge(plugin, item_id, item_thumb, item_module):
+def replay_bridge(plugin, item_id, item_module, item_art=None):
     """
     replay_bridge is the bridge between the
     addon.py file and each channel modules files.
@@ -243,7 +251,7 @@ def replay_bridge(plugin, item_id, item_thumb, item_module):
 
 
 @Route.register
-def website_bridge(plugin, item_id, item_thumb, item_module):
+def website_bridge(plugin, item_id, item_thumb, item_module, item_art=None):
     """
     Like replay_bridge
     """
@@ -255,7 +263,7 @@ def website_bridge(plugin, item_id, item_thumb, item_module):
 
 
 @Resolver.register
-def live_bridge(plugin, item_id, item_thumb, item_module):
+def live_bridge(plugin, item_id, item_module, item_art, item_info=None):
     """
     Like replay_bridge
     """
@@ -263,7 +271,7 @@ def live_bridge(plugin, item_id, item_thumb, item_module):
 
     # Let's go to the module file ...
     item_module = importlib.import_module(item_module)
-    return item_module.live_entry(plugin, item_id, item_thumb)
+    return item_module.live_entry(plugin, item_id, item_info, item_art)
 
 
 def main():

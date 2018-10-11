@@ -284,9 +284,6 @@ def list_videos(plugin, item_id, program_id, sub_category_id):
         yield item
 
 
-def live_entry(plugin, item_id, item_thumb):
-    return get_live_url(plugin, item_id, item_id.upper(), LABELS[item_id], '', item_thumb)
-
 
 @Resolver.register
 def get_video_url(plugin, item_id, video_id, title_value, plot_value, img_value):
@@ -396,11 +393,15 @@ def get_video_url(plugin, item_id, video_id, title_value, plot_value, img_value)
     return False
 
 
+def live_entry(plugin, item_id, item_info, item_art):
+    return get_live_url(plugin, item_id, item_id.upper(), LABELS[item_id], item_info, item_art)
+
+
 @Resolver.register
-def get_live_url(plugin, item_id, video_id, title_value, plot_value, img_value):
+def get_live_url(plugin, item_id, video_id, title_value, item_info, item_art):
 
     if item_id == 'fun_radio' or \
-        item_id == 'rtl2':
+            item_id == 'rtl2':
         video_json = urlquick.get(
             URL_LIVE_JSON % (item_id),
             headers={'User-Agent': web_utils.get_random_ua}, max_age=-1)
@@ -418,13 +419,15 @@ def get_live_url(plugin, item_id, video_id, title_value, plot_value, img_value):
 
         for asset in video_assets:
             if 'delta_hls_h264' in asset["type"]:
-                item = Listitem()
-                item.path = asset['full_physical_path'].encode('utf-8')
+                path = asset['full_physical_path'].encode('utf-8')
+                item = Listitem().from_dict(
+                    path,
+                    title_value,
+                    art=item_art,
+                    info=item_info)
+
                 if 'http' in subtitle_url:
                     item.listitem.setSubtitles([subtitle_url])
-                item.label = title_value
-                item.info['plot'] = plot_value
-                item.art["thumb"] = img_value
                 return item
         return None
 
@@ -515,17 +518,22 @@ def get_live_url(plugin, item_id, video_id, title_value, plot_value, img_value):
 
         for asset in video_assets:
             if 'delta_dashcenc_h264' in asset["type"]:
-                item = Listitem()
-                item.path = asset['full_physical_path'].encode('utf-8')
+                path = asset['full_physical_path'].encode('utf-8')
+                properties = {}
+                properties['inputstreamaddon'] = 'inputstream.adaptive'
+                properties['inputstream.adaptive.manifest_type'] = 'mpd'
+                properties['inputstream.adaptive.license_type'] = 'com.widevine.alpha'
+                properties['inputstream.adaptive.license_key'] = URL_LICENCE_KEY % token
+                item = Listitem().from_dict(
+                    path,
+                    title_value,
+                    art=item_art,
+                    info=item_info,
+                    properties=properties)
+
                 if 'http' in subtitle_url:
                     item.listitem.setSubtitles([subtitle_url])
-                item.label = title_value
-                item.info['plot'] = plot_value
-                item.art["thumb"] = img_value
-                item.property['inputstreamaddon'] = 'inputstream.adaptive'
-                item.property['inputstream.adaptive.manifest_type'] = 'mpd'
-                item.property['inputstream.adaptive.license_type'] = 'com.widevine.alpha'
-                item.property['inputstream.adaptive.license_key'] = URL_LICENCE_KEY % token
+
                 return item
         return None
 
