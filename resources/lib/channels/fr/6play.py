@@ -393,12 +393,12 @@ def get_video_url(plugin, item_id, video_id, title_value, plot_value, img_value)
     return False
 
 
-def live_entry(plugin, item_id, item_info, item_art):
-    return get_live_url(plugin, item_id, item_id.upper(), LABELS[item_id], item_info, item_art)
+def live_entry(plugin, item_id, item_dict):
+    return get_live_url(plugin, item_id, item_id.upper(), item_dict)
 
 
 @Resolver.register
-def get_live_url(plugin, item_id, video_id, title_value, item_info, item_art):
+def get_live_url(plugin, item_id, video_id, item_dict):
 
     if item_id == 'fun_radio' or \
             item_id == 'rtl2':
@@ -419,15 +419,14 @@ def get_live_url(plugin, item_id, video_id, title_value, item_info, item_art):
 
         for asset in video_assets:
             if 'delta_hls_h264' in asset["type"]:
-                path = asset['full_physical_path'].encode('utf-8')
-                item = Listitem().from_dict(
-                    path,
-                    title_value,
-                    art=item_art,
-                    info=item_info)
-
+                item = Listitem()
+                item.path = asset['full_physical_path'].encode('utf-8')
                 if 'http' in subtitle_url:
                     item.listitem.setSubtitles([subtitle_url])
+
+                item.label = item_dict['label']
+                item.info.update(item_dict['info'])
+                item.art.update(item_dict['art'])
                 return item
         return None
 
@@ -518,21 +517,18 @@ def get_live_url(plugin, item_id, video_id, title_value, item_info, item_art):
 
         for asset in video_assets:
             if 'delta_dashcenc_h264' in asset["type"]:
-                path = asset['full_physical_path'].encode('utf-8')
-                properties = {}
-                properties['inputstreamaddon'] = 'inputstream.adaptive'
-                properties['inputstream.adaptive.manifest_type'] = 'mpd'
-                properties['inputstream.adaptive.license_type'] = 'com.widevine.alpha'
-                properties['inputstream.adaptive.license_key'] = URL_LICENCE_KEY % token
-                item = Listitem().from_dict(
-                    path,
-                    title_value,
-                    art=item_art,
-                    info=item_info,
-                    properties=properties)
-
+                item = Listitem()
+                item.path = asset['full_physical_path'].encode('utf-8')
                 if 'http' in subtitle_url:
                     item.listitem.setSubtitles([subtitle_url])
+                item.property['inputstreamaddon'] = 'inputstream.adaptive'
+                item.property['inputstream.adaptive.manifest_type'] = 'mpd'
+                item.property['inputstream.adaptive.license_type'] = 'com.widevine.alpha'
+                item.property['inputstream.adaptive.license_key'] = URL_LICENCE_KEY % token
+
+                item.label = item_dict['label']
+                item.info.update(item_dict['info'])
+                item.art.update(item_dict['art'])
 
                 return item
         return None
