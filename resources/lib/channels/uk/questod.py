@@ -210,9 +210,6 @@ def list_videos(plugin, item_id, program_id, program_season_number):
                 )
                 yield item
 
-def live_entry(plugin, item_id, item_thumb):
-    return get_live_url(plugin, item_id, item_id.upper(), LABELS[item_id], '', item_thumb)
-
 @Resolver.register
 def get_video_url(plugin, item_id, video_id, video_title, video_plot, video_image):
 
@@ -248,8 +245,11 @@ def get_video_url(plugin, item_id, video_id, video_title, video_plot, video_imag
     else:
         return json_parser["playback"]["streamUrlHls"]
 
+def live_entry(plugin, item_id, item_dict):
+    return get_live_url(plugin, item_id, item_id.upper(), item_dict)
+
 @Resolver.register
-def get_live_url(plugin, item_id, video_id, video_title, video_plot, video_image):
+def get_live_url(plugin, item_id, video_id, item_dict):
 
     is_helper = inputstreamhelper.Helper('mpd', drm='widevine')
     if not is_helper.check_inputstream():
@@ -271,9 +271,9 @@ def get_live_url(plugin, item_id, video_id, video_title, video_plot, video_image
 
             item = Listitem()
             item.path = live_url
-            item.label = video_title
-            item.info['plot'] = video_plot
-            item.art["thumb"] = video_image
+            item.label = item_dict['label']
+            item.info.update(item_dict['info'])
+            item.art.update(item_dict['art'])
             item.property['inputstreamaddon'] = 'inputstream.adaptive'
             item.property['inputstream.adaptive.manifest_type'] = 'mpd'
             item.property['inputstream.adaptive.license_type'] = 'com.widevine.alpha'
