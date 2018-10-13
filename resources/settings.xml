@@ -171,6 +171,8 @@
 
         <!-- Content -->
         <setting label="30152" type="lsep" />
+
+            <!-- TV Guide -->
             <setting label="30168" type="bool" id="tv_guide" default="true"/>
 
 
@@ -181,12 +183,12 @@
 
 
     <!-- Download -->
-    <!--<category label="30003">
+    <category label="30003">
         <setting label="30012" type="lsep"/>
         <setting label="30200" type="folder" id="dl_folder" source="" option="writeable"/>
         <setting label="30201" type="labelenum" id="dl_quality" visible="true" values="SD|720p|1080p|Highest available" default="Highest available"/>
         <setting label="30202" type="bool" id="dl_background" default="false" visible="true"/>
-    </category>-->
+    </category>
     <!-- Download -->
 
 

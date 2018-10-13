@@ -24,6 +24,7 @@
 # an effect on Python 2.
 # It makes string literals as unicode like in Python 3
 from __future__ import unicode_literals
+import importlib
 
 
 def item2dict(item):
@@ -36,3 +37,29 @@ def item2dict(item):
     item_dict['params'] = item.params
     item_dict['label'] = item.label
     return item_dict
+
+
+#  SYS.ARGV[0]: plugin://plugin.video.catchuptvandmore/resources/lib/websites/culturepub/list_shows
+def find_module_in_url(base_url):
+    base_url_l = base_url.split('/')
+    module_l = []
+    addon_name_triggered = False
+    for name in base_url_l:
+        if addon_name_triggered:
+            module_l.append(name)
+            continue
+        if name == 'plugin.video.catchuptvandmoretestdrmkodi18':
+            addon_name_triggered = True
+    module_l.pop()  # Pop the function name
+    module = '.'.join(module_l)
+    # print 'MODULE: ' + module
+    return module
+
+
+def import_needed_module(base_url):
+    module_to_import = find_module_in_url(base_url)
+    try:
+        importlib.import_module(module_to_import)
+    except Exception:
+        pass
+    return module_to_import

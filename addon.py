@@ -265,15 +265,17 @@ def main():
     """
     Before running the plugin we need
     to check if there is any module
-    to load on the fly
+    to load on the fly (e.g. mytf1.py)
+    (To prevent error when coming from
+    a "favorite" Kodi item)
     """
-    module_to_load = Script.setting['module_to_load']
-    if module_to_load != '':
-        try:
-            importlib.import_module(module_to_load)
-        except Exception:
-            pass
+    import_needed_module(sys.argv[0])
 
+    """
+    Then we let CodeQuick check for
+    functions to register and call
+    the correct function according to Kodi URL
+    """
     run()
 
 

@@ -24,7 +24,7 @@
 # an effect on Python 2.
 # It makes string literals as unicode like in Python 3
 from __future__ import unicode_literals
-from codequick import Script
+from codequick import Script, utils
 
 """
 
@@ -346,7 +346,7 @@ LABELS = {
 
     # Poland channels / live TV
     'tvp': 'TVP',
-    'tvp3': 'TVP 3 (' + "Script.setting['tvp3.region']" + ')',
+    'tvp3': 'TVP 3 (' + utils.ensure_unicode(Script.setting['tvp3.region']) + ')',
     'tvpinfo': 'TVP Info',
     'tvppolonia': 'TVP Polonia',
 
