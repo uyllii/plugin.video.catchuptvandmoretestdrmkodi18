@@ -105,7 +105,8 @@ def list_videos(plugin, item_id, serie_id):
     
     for video_datas in json_parser["state"]["content"]["series"][serie_id]:
                  
-        video_title = video_datas["brand_name"] + ' - ' + video_datas["name"] + ' S%sE%s' % (video_datas["series_number"], str(video_datas["episode_number"]))
+        video_title = video_datas["brand_name"] + \
+            ' - ' ' S%sE%s' % (video_datas["series_number"], str(video_datas["episode_number"])) + ' - ' + video_datas["name"]
         video_image = video_datas["image"]
         video_plot = video_datas["synopsis"]
         video_duration = video_datas["duration"] * 60
