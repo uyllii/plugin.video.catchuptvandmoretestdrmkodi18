@@ -78,7 +78,7 @@ def list_programs(plugin, item_id):
     for serie_id in json_parser["state"]["content"]["series"]:
         for program_datas in json_parser["state"]["content"]["series"][serie_id]:
             if item_id == program_datas["channel"]:
-                program_title = program_datas["brand_name"]
+                program_title = program_datas["brand_name"] + ' (Season %s)' % program_datas["series_number"]
                 item = Listitem()
                 item.label = program_title
                 item.set_callback(
