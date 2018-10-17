@@ -46,7 +46,8 @@ URL_ROOT = 'https://uktvplay.uktv.co.uk'
 URL_SHOWS = URL_ROOT + '/shows/'
 # channel_name
 
-URL_BRIGHTCOVE_DATAS = 'https://s3-eu-west-1.amazonaws.com/uktv-static/prod/play/app.f9f9840edb0a29f05ebf.js'
+URL_BRIGHTCOVE_DATAS = 'https://s3-eu-west-1.amazonaws.com/uktv-static/prod/play/app.%s.js'
+# JS_id
 
 URL_BRIGHTCOVE_POLICY_KEY = 'http://players.brightcove.net/%s/%s_default/index.min.js'
 # AccountId, PlayerId
@@ -97,7 +98,9 @@ def list_videos(plugin, item_id, serie_id):
     json_parser = json.loads(json_value)
 
     # Get data_account / data_player
-    resp2 = urlquick.get(URL_BRIGHTCOVE_DATAS)
+    js_id = re.compile(
+        r'uktv\-static\/prod\/play\/app\.(.*?)\.js').findall(resp.text)[0]
+    resp2 = urlquick.get(URL_BRIGHTCOVE_DATAS % js_id)
     data_account = re.compile(
         r'VUE_APP_BRIGHTCOVE_ACCOUNT\:\"(.*?)\"').findall(resp2.text)[0]
     data_player = re.compile(
