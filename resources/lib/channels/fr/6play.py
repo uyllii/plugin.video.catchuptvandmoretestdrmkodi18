@@ -363,12 +363,12 @@ def get_video_url(plugin, item_id, video_id, title_value, plot_value, img_value)
     subtitle_url = ''
     for asset in video_assets:
         if 'subtitle_vtt' in asset["type"]:
-            subtitle_url = asset['full_physical_path'].encode('utf-8')
+            subtitle_url = asset['full_physical_path']
 
     for asset in video_assets:
         if 'usp_dashcenc_h264' in asset["type"]:
             item = Listitem()
-            item.path = asset['full_physical_path'].encode('utf-8')
+            item.path = asset['full_physical_path']
             if 'http' in subtitle_url:
                 item.listitem.setSubtitles([subtitle_url])
             item.label = title_value
@@ -383,7 +383,7 @@ def get_video_url(plugin, item_id, video_id, title_value, plot_value, img_value)
         if 'http_h264' in asset["type"]:
             if "hd" in asset["video_quality"]:
                 item = Listitem()
-                item.path = asset['full_physical_path'].encode('utf-8')
+                item.path = asset['full_physical_path']
                 if 'http' in subtitle_url:
                     item.listitem.setSubtitles([subtitle_url])
                 item.label = title_value
@@ -415,12 +415,12 @@ def get_live_url(plugin, item_id, video_id, item_dict):
         subtitle_url = ''
         for asset in video_assets:
             if 'subtitle_vtt' in asset["type"]:
-                subtitle_url = asset['full_physical_path'].encode('utf-8')
+                subtitle_url = asset['full_physical_path']
 
         for asset in video_assets:
             if 'delta_hls_h264' in asset["type"]:
                 item = Listitem()
-                item.path = asset['full_physical_path'].encode('utf-8')
+                item.path = asset['full_physical_path']
                 if 'http' in subtitle_url:
                     item.listitem.setSubtitles([subtitle_url])
 
@@ -513,12 +513,12 @@ def get_live_url(plugin, item_id, video_id, item_dict):
         subtitle_url = ''
         for asset in video_assets:
             if 'subtitle_vtt' in asset["type"]:
-                subtitle_url = asset['full_physical_path'].encode('utf-8')
+                subtitle_url = asset['full_physical_path']
 
         for asset in video_assets:
             if 'delta_dashcenc_h264' in asset["type"]:
                 item = Listitem()
-                item.path = asset['full_physical_path'].encode('utf-8')
+                item.path = asset['full_physical_path']
                 if 'http' in subtitle_url:
                     item.listitem.setSubtitles([subtitle_url])
                 item.property['inputstreamaddon'] = 'inputstream.adaptive'

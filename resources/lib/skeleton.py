@@ -265,8 +265,7 @@ UK_REPLAY = {
         'fanart': ['channels', 'uk', 'questod_fanart.jpg'],
         'module': 'resources.lib.channels.uk.questod'
     },
-    #  UKTVPlay - DRM SAMPLE-AES
-     'dave': {
+    'dave': {
         'callback': 'replay_bridge',
         'thumb': ['channels', 'uk', 'dave.png'],
         'fanart': ['channels', 'uk', 'dave_fanart.jpg'],
