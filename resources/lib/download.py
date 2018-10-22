@@ -24,40 +24,60 @@
 # an effect on Python 2.
 # It makes string literals as unicode like in Python 3
 from __future__ import unicode_literals
+
+import os
+import xbmcvfs
 from codequick import Script
+from resources.lib import cq_utils
 
 
-def download_video(video_url):
+def download_video(video_url, video_name=None):
     #  print('URL Video to download ' + video_url)
 
     #  Now that we have video URL we can try to download this one
     YDStreamUtils = __import__('YDStreamUtils')
     YDStreamExtractor = __import__('YDStreamExtractor')
 
-    quality_string = {
-        'SD': 0,
-        '720p': 1,
-        '1080p': 2,
-        'Highest available': 3
-    }
-
     vid = YDStreamExtractor.getVideoInfo(
         video_url,
-        quality=quality_string[Script.setting.get_string('dl_quality')],
+        quality=cq_utils.get_quality_YTDL(download_mode=True),
         resolve_redirects=True
     )
 
     path = Script.setting.get_string('dl_folder')
-    #  path = path.decode("utf-8").encode(common.FILESYSTEM_CODING)
-
+    download_ok = False
     with YDStreamUtils.DownloadProgress() as prog:
         try:
             YDStreamExtractor.setOutputCallback(prog)
-            YDStreamExtractor.handleDownload(
+            result = YDStreamExtractor.handleDownload(
                 vid,
                 bg=Script.setting.get_boolean('dl_background'),
                 path=path
             )
+            if result:
+                if result.status == 'canceled':
+                    error_message = result.message
+                    Script.log('Download failed: %s' % error_message)
+                else:
+                    full_path_to_file = result.filepath
+                    Script.log('Download success: %s' % full_path_to_file)
+                    download_ok = True
+
         finally:
             YDStreamExtractor.setOutputCallback(None)
+
+    if path != '' and \
+            Script.setting.get_boolean('dl_item_filename') and \
+            video_name is not None and \
+            download_ok:
+
+        try:
+            filename = os.path.basename(full_path_to_file)
+            _, file_extension = os.path.splitext(full_path_to_file)
+            current_filepath = os.path.join(path, filename)
+            final_filepath = os.path.join(path, video_name + file_extension)
+            xbmcvfs.rename(current_filepath, final_filepath)
+        except Exception:
+            Script.log('Failed to rename video file')
+
     return False

@@ -159,13 +159,15 @@ LABELS = {
     'Search videos': 30714,
     'Search programs': 30715,
     'Video stream is not available': 30716,
+    'All programs': 30717,
 
     # Other
     'drm_notification': 30702,
     'choose_video_quality': 30709,
+    'No videos found': 30718,
 
     # Belgium channels / live TV
-    'auvio': 'RTBF Auvio (La Une, La deux, La Trois, ...)',
+    'auvio': 'RTBF Auvio',
     'brf': 'BRF Mediathek',
     'rtl_tvi': 'RTL-TVI',
     'plug_rtl': 'PLUG RTL',
@@ -191,6 +193,7 @@ LABELS = {
     'tva': 'TVA',
     'icitele': 'ICI Télé',
     'ntvca': 'NTV',
+    'icitoutv': 'ICI Tou.tv',
 
     # Switzerland channels / live TV
     'rts': 'RTS',
@@ -239,7 +242,7 @@ LABELS = {
     '6ter': '6ter',
     'rmcstory': 'RMC Story',
     'cherie25': 'Chérie 25',
-    'la_1ere': 'La 1ère (' + Script.setting['la_1ere.region'] + ')',
+    'la_1ere': 'La 1ère (' + utils.ensure_unicode(Script.setting['la_1ere.region']) + ')',
     'franceinfo': 'France Info',
     'bfmbusiness': 'BFM Business',
     'rmc': 'RMC',
@@ -252,7 +255,7 @@ LABELS = {
     'comedy': 'Comic (6play)',
     'fun_radio': 'Fun Radio',
     'publicsenat': 'Public Sénat',
-    'france3regions': 'France 3 Régions (' + Script.setting['france3.region'] + ')',
+    'france3regions': 'France 3 Régions (' + utils.ensure_unicode(Script.setting['france3.region']) + ')',
     'francetvsport': 'France TV Sport (francetv)',
     'histoire': 'Histoire',
     'tvbreizh': 'TV Breizh',
@@ -282,6 +285,7 @@ LABELS = {
     'rtl2': 'RTL 2',
     'lachainemeteo': 'La Chaîne Météo',
     'mb': 'M6 Boutique',
+    'j_one': 'J-One',
 
     # Japan channels / live TV
     'nhknews': 'NHK ニュース',
@@ -384,5 +388,6 @@ LABELS = {
     'fosdem': 'Fosdem',
     'ina': 'Ina',
     'onf': 'Office National du Film du Canada',
-    'nfb': 'National Film Board Of Canada'
+    'nfb': 'National Film Board Of Canada',
+    'marmiton': 'Marmiton'
 }

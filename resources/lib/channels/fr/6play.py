@@ -30,6 +30,7 @@ from codequick import Route, Resolver, Listitem, utils, Script
 
 from resources.lib.labels import *
 from resources.lib import web_utils
+import resources.lib.cq_utils as cqu
 
 import inputstreamhelper
 import json
@@ -271,22 +272,19 @@ def list_videos(plugin, item_id, program_id, sub_category_id):
             item.info.date(aired, '%Y-%m-%d')
         except:
             pass
-        item.info['mediatype'] = 'tvshow'
 
         item.set_callback(
             get_video_url,
             item_id=item_id,
             video_id=video_id,
-            title_value=title,
-            plot_value=description,
-            img_value=program_img
+            item_dict=cqu.item2dict(item)
         )
         yield item
 
 
 
 @Resolver.register
-def get_video_url(plugin, item_id, video_id, title_value, plot_value, img_value):
+def get_video_url(plugin, item_id, video_id, item_dict):
 
     resp_js_id = urlquick.get(URL_GET_JS_ID_API_KEY)
     js_id = re.compile(
@@ -371,9 +369,9 @@ def get_video_url(plugin, item_id, video_id, title_value, plot_value, img_value)
             item.path = asset['full_physical_path']
             if 'http' in subtitle_url:
                 item.listitem.setSubtitles([subtitle_url])
-            item.label = title_value
-            item.info['plot'] = plot_value
-            item.art["thumb"] = img_value
+            item.label = item_dict['label']
+            item.info.update(item_dict['info'])
+            item.art.update(item_dict['art'])
             item.property['inputstreamaddon'] = 'inputstream.adaptive'
             item.property['inputstream.adaptive.manifest_type'] = 'mpd'
             item.property['inputstream.adaptive.license_type'] = 'com.widevine.alpha'
@@ -386,9 +384,9 @@ def get_video_url(plugin, item_id, video_id, title_value, plot_value, img_value)
                 item.path = asset['full_physical_path']
                 if 'http' in subtitle_url:
                     item.listitem.setSubtitles([subtitle_url])
-                item.label = title_value
-                item.info['plot'] = plot_value
-                item.art["thumb"] = img_value
+                item.label = item_dict['label']
+                item.info.update(item_dict['info'])
+                item.art.update(item_dict['art'])
                 return item
     return False
 

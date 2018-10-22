@@ -26,22 +26,26 @@
 from __future__ import unicode_literals
 import importlib
 
-from codequick import Route, Resolver, Listitem, run, Script, utils
+from codequick import Route, Resolver, Listitem, run, Script, utils, storage
+import urlquick
 import xbmcplugin
+import xbmc
+import xbmcgui
 
-from resources.lib.skeleton import *
-from resources.lib.labels import *
+import resources.lib.skeleton as sk
+from resources.lib.labels import LABELS
 from resources.lib import common
-from resources.lib.cq_utils import *
+import resources.lib.cq_utils as cqu
+from resources.lib import vpn
 
 
-def get_sorted_menu(item_id):
+def get_sorted_menu(menu_id):
     # The current menu to build contains
-    # all the items present in the 'item_id'
+    # all the items present in the 'menu_id'
     # dictionnary of the skeleton.py file
-    current_menu = eval(item_id.upper())
+    current_menu = eval('sk.' + menu_id.upper())
 
-    # First, we have to sort the current menu
+    # First, we have to sort the current menu items
     # according to each item order and we have
     # to hide each disabled item
     menu = []
@@ -65,6 +69,50 @@ def get_sorted_menu(item_id):
     return sorted(menu, key=lambda x: x[0])
 
 
+def add_context_menus_to_item(
+        plugin, item, index, item_id, menu_id, menu_len):
+
+    # Move up
+    if index > 0:
+        item.context.script(
+            move_item,
+            plugin.localize(LABELS['Move up']),
+            direction='up',
+            item_id=item_id,
+            menu_id=menu_id)
+
+    # Move down
+    if index < menu_len - 1:
+        item.context.script(
+            move_item,
+            plugin.localize(LABELS['Move down']),
+            direction='down',
+            item_id=item_id,
+            menu_id=menu_id)
+
+    # Hide
+    item.context.script(
+        hide_item,
+        plugin.localize(LABELS['Hide']),
+        item_id=item_id)
+
+    # Connect/Disconnect VPN
+    with storage.PersistentDict('vpn') as db:
+        vpn_label = plugin.localize(LABELS['Connect VPN'])
+        if 'status' in db:
+            if db['status'] == 'connected':
+                vpn_label = plugin.localize(LABELS['Disconnect VPN'])
+        else:
+            db['status'] = 'disconnected'
+            db.flush()
+
+        item.context.script(
+            vpn.vpn_item_callback,
+            vpn_label)
+
+    return
+
+
 @Route.register
 def root(plugin):
     """
@@ -73,17 +121,28 @@ def root(plugin):
     """
     # First menu to build is the root menu
     # (see ROOT dictionnary in skeleton.py)
+
+    # TEMPO (waiting for the CodeQuick update)
+    plugin.cache_to_disc = True
+
     return generic_menu(plugin, 'ROOT')
 
 
 @Route.register
-def generic_menu(plugin, item_id, item_dict={}):
+def generic_menu(plugin, menu_id):
     """
     Build a generic addon menu
     with all not hidden items
     """
-    plugin.add_sort_methods(xbmcplugin.SORT_METHOD_UNSORTED)
-    menu = get_sorted_menu(item_id)
+
+    # TEMPO (waiting for the CodeQuick update)
+    plugin.cache_to_disc = True
+
+    menu = get_sorted_menu(menu_id)
+
+    if not menu:
+        # If the selected menu is empty just reload the current menu
+        yield False
 
     for index, (item_order,
                 item_id,
@@ -91,7 +150,9 @@ def generic_menu(plugin, item_id, item_dict={}):
                 ) in enumerate(menu):
 
         item = Listitem()
-        item.params['item_id'] = item_id
+
+        add_context_menus_to_item(
+            plugin, item, index, item_id, menu_id, len(menu))
 
         label = LABELS[item_id]
         if isinstance(label, int):
@@ -114,18 +175,23 @@ def generic_menu(plugin, item_id, item_dict={}):
 
         # Get the next action to trigger if this
         # item will be selected by the user
-        item .set_callback(
+        item.set_callback(
             eval(item_infos['callback']),
-            item_dict=item2dict(item))
+            item_id)
 
         yield item
 
 
 @Route.register
-def tv_guide_menu(plugin, item_id, item_module=None, item_dict={}):
+def tv_guide_menu(plugin, menu_id, item_module=None):
+
+    # TEMPO (waiting for the CodeQuick update)
+    plugin.cache_to_disc = True
+
+    # Move up and move down action only work with this sort method
     plugin.add_sort_methods(xbmcplugin.SORT_METHOD_UNSORTED)
 
-    menu = get_sorted_menu(item_id)
+    menu = get_sorted_menu(menu_id)
     channels_id = []
     for index, (channel_order,
                 channel_id,
@@ -133,94 +199,102 @@ def tv_guide_menu(plugin, item_id, item_module=None, item_dict={}):
                 ) in enumerate(menu):
         channels_id.append(channel_id)
 
-    # Load the graber module accroding to the country (e.g. resources.lib.channels.tv_guides.fr_live)
-    tv_guide_module_path = 'resources.lib.channels.tv_guides.' + item_id
+    # Load the graber module accroding to the country
+    # (e.g. resources.lib.channels.tv_guides.fr_live)
+    tv_guide_module_path = 'resources.lib.channels.tv_guides.' + menu_id
     tv_guide_module = importlib.import_module(tv_guide_module_path)
 
     # For each channel grab the current program according to the current time
     tv_guide = tv_guide_module.grab_tv_guide(channels_id)
 
-    for index, (item_order,
-                item_id,
-                item_infos
+    for index, (channel_order,
+                channel_id,
+                channel_infos
                 ) in enumerate(menu):
 
         item = Listitem()
-        item.params['item_id'] = item_id
 
-        label = LABELS[item_id]
+        add_context_menus_to_item(
+            plugin, item, index, channel_id, menu_id, len(menu))
+
+        label = LABELS[channel_id]
         if isinstance(label, int):
             label = plugin.localize(label)
         item.label = utils.color(label, 'blue')
 
         # Get item path of icon and fanart
-        if 'thumb' in item_infos:
+        if 'thumb' in channel_infos:
             item.art["thumb"] = common.get_item_media_path(
-                item_infos['thumb'])
+                channel_infos['thumb'])
 
-        if 'fanart' in item_infos:
+        if 'fanart' in channel_infos:
             item.art["fanart"] = common.get_item_media_path(
-                item_infos['fanart'])
+                channel_infos['fanart'])
 
         # If this item requires a module to work, get
         # the module path to be loaded
-        if 'module' in item_infos:
-            item.params['item_module'] = item_infos['module']
+        if 'module' in channel_infos:
+            item.params['item_module'] = channel_infos['module']
 
         # If we have program infos from the grabber
-        if item_id in tv_guide:
-            channel_infos = tv_guide[item_id]
+        if channel_id in tv_guide:
+            channel_guide_infos = tv_guide[channel_id]
 
-            if 'title' in channel_infos:
-                item.label = item.label + ' — ' + utils.italic(channel_infos['title'])
+            if 'title' in channel_guide_infos:
+                item.label = item.label + ' — ' + \
+                    utils.italic(channel_guide_infos['title'])
 
-            if 'originaltitle' in channel_infos:
-                item.info['originaltitle'] = channel_infos['originaltitle']
+            if 'originaltitle' in channel_guide_infos:
+                item.info['originaltitle'] = channel_guide_infos['originaltitle']
 
-            if 'genre' in channel_infos:
-                item.info['genre'] = channel_infos['genre']
+            if 'genre' in channel_guide_infos:
+                item.info['genre'] = channel_guide_infos['genre']
 
-            plot = ''
-            if 'soustitre' in channel_infos:
-                plot = channel_infos['soustitre']
+            plot = []
 
-            if 'plot' in channel_infos:
-                plot = plot + '\n' + channel_infos['plot']
-            item.info['plot'] = plot
+            if 'genre_specifique' in channel_guide_infos:
+                plot.append(channel_guide_infos['genre_specifique'])
 
-            if 'director' in channel_infos:
-                item.info['director'] = channel_infos['director']
+            if 'debut' in channel_guide_infos and 'fin' in channel_guide_infos:
+                debut_l = channel_guide_infos['debut'].split()[1].split(':')
+                fin_l = channel_guide_infos['fin'].split()[1].split(':')
+                plot.append(debut_l[0] + 'h' + debut_l[1] + ' - ' + fin_l[0] + 'h' + fin_l[1])
 
-            if 'cast' in channel_infos:
-                item.info['cast'] = channel_infos['cast']
+            if 'soustitre' in channel_guide_infos:
+                plot.append(channel_guide_infos['soustitre'])
 
-            if 'writer' in channel_infos:
-                item.info['writer'] = channel_infos['writer']
+            if 'plot' in channel_guide_infos:
+                plot.append(channel_guide_infos['plot'])
 
-            if 'year' in channel_infos:
-                item.info['year'] = channel_infos['year']
+            item.info['plot'] = '\n'.join(plot)
 
-            if 'episode' in channel_infos:
-                item.info['episode'] = channel_infos['episode']
+            if 'episode' in channel_guide_infos:
+                item.info['episode'] = channel_guide_infos['episode']
 
-            if 'season' in channel_infos:
-                item.info['season'] = channel_infos['season']
+            if 'season' in channel_guide_infos:
+                item.info['season'] = channel_guide_infos['season']
 
-            if 'image' in channel_infos:
-                item.art["fanart"] = channel_infos['image']
+            if 'fanart' in channel_guide_infos:
+                item.art["fanart"] = channel_guide_infos['fanart']
 
-            if 'rating' in channel_infos:
-                item.info["rating"] = channel_infos['rating']
+            if 'thumb' in channel_guide_infos:
+                item.art["thumb"] = channel_guide_infos['thumb']
 
-        item .set_callback(
-            eval(item_infos['callback']),
-            item_dict=item2dict(item))
+            if 'rating' in channel_guide_infos:
+                item.info["rating"] = channel_guide_infos['rating']
+
+        # Get the next action to trigger if this
+        # item will be selected by the user
+        item.set_callback(
+            eval(channel_infos['callback']),
+            channel_id,
+            item_dict=cqu.item2dict(item))
 
         yield item
 
 
 @Route.register
-def replay_bridge(plugin, item_id, item_module, item_dict={}):
+def replay_bridge(plugin, item_id, item_module):
     """
     replay_bridge is the bridge between the
     addon.py file and each channel modules files.
@@ -230,6 +304,9 @@ def replay_bridge(plugin, item_id, item_module, item_dict={}):
     So we have to load on the fly the corresponding
     module of the channel.
     """
+    # TEMPO (waiting for the CodeQuick update)
+    plugin.cache_to_disc = True
+
     plugin.setting['module_to_load'] = item_module
 
     # Let's go to the module file ...
@@ -238,10 +315,14 @@ def replay_bridge(plugin, item_id, item_module, item_dict={}):
 
 
 @Route.register
-def website_bridge(plugin, item_id, item_module, item_dict={}):
+def website_bridge(plugin, item_id, item_module):
     """
     Like replay_bridge
     """
+
+    # TEMPO (waiting for the CodeQuick update)
+    plugin.cache_to_disc = True
+
     plugin.setting['module_to_load'] = item_module
 
     # Let's go to the module file ...
@@ -249,16 +330,107 @@ def website_bridge(plugin, item_id, item_module, item_dict={}):
     return item_module.website_entry(plugin, item_id)
 
 
+@Route.register
+def multi_live_bridge(plugin, item_id, item_module, item_dict={}):
+    """
+    Like replay_bridge
+    """
+
+    # TEMPO (waiting for the CodeQuick update)
+    plugin.cache_to_disc = True
+
+    plugin.setting['module_to_load'] = item_module
+
+    # Let's go to the module file ...
+    item_module = importlib.import_module(item_module)
+    return item_module.multi_live_entry(plugin, item_id)
+
+
 @Resolver.register
 def live_bridge(plugin, item_id, item_module, item_dict={}):
     """
     Like replay_bridge
     """
+
+    # TEMPO (waiting for the CodeQuick update)
+    plugin.cache_to_disc = True
+
     plugin.setting['module_to_load'] = item_module
 
     # Let's go to the module file ...
     item_module = importlib.import_module(item_module)
     return item_module.live_entry(plugin, item_id, item_dict)
+
+
+@Route.register
+def clear_cache(plugin):
+    # Callback function of clear cache setting button
+    urlquick.cache_cleanup(-1)
+    Script.notify(plugin.localize(30371), '')
+    return False
+
+
+@Route.register
+def move_item(plugin, direction, item_id, menu_id):
+    # Callback function of move item conext menu
+    if direction == 'down':
+        offset = 1
+    elif direction == 'up':
+        offset = -1
+
+    item_to_move_id = item_id
+    item_to_move_order = plugin.setting.get_int(item_to_move_id + '.order')
+
+    menu = get_sorted_menu(menu_id)
+
+    for k in range(0, len(menu)):
+        item = menu[k]
+        item_id = item[1]
+        if item_to_move_id == item_id:
+            item_to_swap = menu[k + offset]
+            item_to_swap_order = item_to_swap[0]
+            item_to_swap_id = item_to_swap[1]
+            plugin.setting[item_to_move_id + '.order'] = item_to_swap_order
+            plugin.setting[item_to_swap_id + '.order'] = item_to_move_order
+            xbmc.executebuiltin('XBMC.Container.Refresh()')
+            break
+
+    return False
+
+
+@Route.register
+def hide_item(plugin, item_id):
+    # Callback function of hide item context menu
+    if plugin.setting.get_boolean('show_hidden_items_information'):
+        xbmcgui.Dialog().ok(
+            plugin.localize(LABELS['Information']),
+            plugin.localize(
+                LABELS['To re-enable hidden items go to the plugin settings']))
+        plugin.setting['show_hidden_items_information'] = False
+
+    plugin.setting[item_id] = False
+    xbmc.executebuiltin('XBMC.Container.Refresh()')
+    return False
+
+
+@Route.register
+def vpn_import_setting(plugin):
+    # Callback function of OpenVPN import config file setting button
+    vpn.import_ovpn()
+    return False
+
+
+@Route.register
+def vpn_delete_setting(plugin):
+    # Callback function of OpenVPN delete config file setting button
+    vpn.delete_ovpn()
+    return False
+
+
+@Route.register
+def vpn_connectdisconnect_setting(plugin):
+    # Callback function of OpenVPN connect/disconnect setting button
+    return vpn.vpn_item_callback(plugin)
 
 
 def main():
@@ -269,12 +441,13 @@ def main():
     (To prevent error when coming from
     a "favorite" Kodi item)
     """
-    import_needed_module(sys.argv[0])
+    cqu.import_needed_module()
 
     """
     Then we let CodeQuick check for
     functions to register and call
-    the correct function according to Kodi URL
+    the correct function according to
+    the Kodi URL
     """
     run()
 

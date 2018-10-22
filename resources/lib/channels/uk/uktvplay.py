@@ -30,6 +30,7 @@ from codequick import Route, Resolver, Listitem, utils, Script
 from resources.lib.labels import *
 from resources.lib import web_utils
 from resources.lib import resolver_proxy
+import resources.lib.cq_utils as cqu
 
 
 import json
@@ -70,7 +71,7 @@ def list_programs(plugin, item_id):
     - Les feux de l'amour
     - ...
     """
-    resp = urlquick.get(URL_SHOWS)
+    resp = urlquick.get(URL_SHOWS, headers={'User-Agent': web_utils.get_random_ua})
     json_value = re.compile(
         r'window\.\_\_NUXT\_\_\=(.*?)\;\<\/script\>').findall(resp.text)[0]
     json_parser = json.loads(json_value)
@@ -126,9 +127,7 @@ def list_videos(plugin, item_id, serie_id):
             data_account=data_account,
             data_player=data_player,
             data_video_id=video_id,
-            video_title=video_title,
-            video_plot=video_plot,
-            video_image=video_image)
+            item_dict=cqu.item2dict(item))
         yield item
 
 
@@ -142,7 +141,7 @@ def get_brightcove_policy_key(data_account, data_player):
 
 
 @Resolver.register
-def get_video_url(plugin, item_id, data_account, data_player, data_video_id, video_title, video_plot, video_image):
+def get_video_url(plugin, item_id, data_account, data_player, data_video_id, item_dict):
 
 
     # Method to get JSON from 'edge.api.brightcove.com'
@@ -164,9 +163,9 @@ def get_video_url(plugin, item_id, data_account, data_player, data_video_id, vid
     
     item = Listitem()
     item.path = video_url
-    item.label = video_title
-    item.info['plot'] = video_plot
-    item.art["thumb"] = video_image
+    item.label = item_dict['label']
+    item.info.update(item_dict['info'])
+    item.art.update(item_dict['art'])
     item.property['inputstreamaddon'] = 'inputstream.adaptive'
     item.property['inputstream.adaptive.manifest_type'] = 'mpd'
     item.property['inputstream.adaptive.license_type'] = 'com.widevine.alpha'

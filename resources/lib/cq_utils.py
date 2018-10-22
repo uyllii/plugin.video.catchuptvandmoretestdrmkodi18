@@ -25,6 +25,12 @@
 # It makes string literals as unicode like in Python 3
 from __future__ import unicode_literals
 import importlib
+import xbmcgui
+import xbmc
+import sys
+
+from codequick import Script
+from resources.lib.labels import LABELS
 
 
 def item2dict(item):
@@ -39,8 +45,8 @@ def item2dict(item):
     return item_dict
 
 
-#  SYS.ARGV[0]: plugin://plugin.video.catchuptvandmore/resources/lib/websites/culturepub/list_shows
 def find_module_in_url(base_url):
+    # e.g. base_url = plugin://plugin.video.catchuptvandmore/resources/lib/websites/culturepub/list_shows
     base_url_l = base_url.split('/')
     module_l = []
     addon_name_triggered = False
@@ -50,16 +56,62 @@ def find_module_in_url(base_url):
             continue
         if name == 'plugin.video.catchuptvandmoretestdrmkodi18':
             addon_name_triggered = True
-    module_l.pop()  # Pop the function name
+    module_l.pop()  # Pop the function name (e.g. list_shows)
     module = '.'.join(module_l)
-    # print 'MODULE: ' + module
+    # Returned module: resources.lib.websites.culturepub
     return module
 
 
-def import_needed_module(base_url):
-    module_to_import = find_module_in_url(base_url)
+def import_needed_module():
+    # Import needed module according to the
+    # base URL (Fix for Kodi favorite item)
+    module_to_import = find_module_in_url(sys.argv[0])
     try:
         importlib.import_module(module_to_import)
     except Exception:
         pass
-    return module_to_import
+
+    module_to_load_2 = Script.setting['module_to_load']
+    if module_to_load_2 != '':
+        try:
+            importlib.import_module(module_to_load_2)
+        except Exception:
+            pass
+    return
+
+
+def get_quality_YTDL(download_mode=False):
+    # If not download mode get the 'quality' setting
+    if not download_mode:
+        quality = Script.setting.get_string('quality')
+        if quality == 'BEST':
+            return 3
+        elif quality == 'DEFAULT':
+            return 3
+        elif quality == 'DIALOG':
+            youtubeDL_qualiy = ['SD', '720p', '1080p', 'Highest Available']
+            seleted_item = xbmcgui.Dialog().select(
+                Script.localize(LABELS['choose_video_quality']),
+                youtubeDL_qualiy)
+            return seleted_item
+
+        else:
+            return 3
+
+    # Else we need to use the 'dl_quality' setting
+    elif download_mode:
+        dl_quality = Script.setting.get_string('dl_quality')
+        if dl_quality == 'SD':
+            return 0
+        if dl_quality == '720p':
+            return 1
+        if dl_quality == '1080p':
+            return 2
+        if dl_quality == 'Highest available':
+            return 3
+        return 3
+
+
+def get_kodi_version():
+    xbmc_version = xbmc.getInfoLabel("System.BuildVersion")
+    return int(xbmc_version.split('-')[0].split('.')[0])

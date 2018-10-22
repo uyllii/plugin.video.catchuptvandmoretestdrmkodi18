@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="plugin.video.catchuptvandmoretestdrmkodi18"
        name="Catch-up TV &amp; More Test DRM Kodi 18"
-       version="0.1.0~beta03"
+       version="0.1.0~beta04"
        provider-name="SylvainCcchetto,wwark">
   <requires>
     <import addon="xbmc.python" version="2.26.0"/>
@@ -9,8 +9,6 @@
     <import addon="script.module.youtube.dl" version="18.225.0"/>
     <import addon="script.module.inputstreamhelper" version="0.3.3"/>
     <import addon="script.module.codequick" version="0.9.5"/>
-    <import addon="script.module.html2text" version="2015.6.21"/>
-    <import addon="script.module.pytz" version="2014.2"/>
   </requires>
   <extension point="xbmc.python.pluginsource" library="addon.py">
     <provides>video</provides>

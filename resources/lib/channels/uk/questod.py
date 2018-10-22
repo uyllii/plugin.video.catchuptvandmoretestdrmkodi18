@@ -26,6 +26,7 @@ from codequick import Route, Resolver, Listitem, utils, Script
 
 from resources.lib.labels import *
 from resources.lib import web_utils
+import resources.lib.cq_utils as cqu
 
 import inputstreamhelper
 import json
@@ -204,14 +205,12 @@ def list_videos(plugin, item_id, program_id, program_season_number):
                     get_video_url,
                     item_id=item_id,
                     video_id=video_id,
-                    video_title=video_title,
-                    video_plot=video_plot,
-                    video_image=video_image
+                    item_dict=cqu.item2dict(item)
                 )
                 yield item
 
 @Resolver.register
-def get_video_url(plugin, item_id, video_id, video_title, video_plot, video_image):
+def get_video_url(plugin, item_id, video_id, item_dict):
 
     is_helper = inputstreamhelper.Helper('mpd', drm='widevine')
     if not is_helper.check_inputstream():
@@ -233,9 +232,9 @@ def get_video_url(plugin, item_id, video_id, video_title, video_plot, video_imag
 
         item = Listitem()
         item.path = json_parser["playback"]["streamUrlDash"]
-        item.label = video_title
-        item.info['plot'] = video_plot
-        item.art["thumb"] = video_image
+        item.label = item_dict['label']
+        item.info.update(item_dict['info'])
+        item.art.update(item_dict['art'])
         item.property['inputstreamaddon'] = 'inputstream.adaptive'
         item.property['inputstream.adaptive.manifest_type'] = 'mpd'
         item.property['inputstream.adaptive.license_type'] = 'com.widevine.alpha'

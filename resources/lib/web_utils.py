@@ -23,8 +23,8 @@
 from random import randint
 
 user_agents = [
-    'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36'
-    ' (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36',
+    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36'
+    '(KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36',
     'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1',
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.75.14'
     ' (KHTML, like Gecko) Version/7.0.3 Safari/7046A194A',
@@ -35,6 +35,10 @@ user_agents = [
     'AppleWebKit/537.36 (KHTML, like Gecko) '
     'Chrome/55.0.2883.87 Safari/537.36'
 ]
+
+
+def get_ua():
+    return user_agents[0]
 
 
 def get_random_ua():
