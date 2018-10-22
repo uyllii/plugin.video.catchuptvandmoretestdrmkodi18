@@ -265,28 +265,10 @@ UK_REPLAY = {
         'fanart': ['channels', 'uk', 'questod_fanart.jpg'],
         'module': 'resources.lib.channels.uk.questod'
     },
-    'dave': {
+    'uktvplay': {
         'callback': 'replay_bridge',
-        'thumb': ['channels', 'uk', 'dave.png'],
-        'fanart': ['channels', 'uk', 'dave_fanart.jpg'],
-        'module': 'resources.lib.channels.uk.uktvplay'
-    },
-    'really': {
-        'callback': 'replay_bridge',
-        'thumb': ['channels', 'uk', 'really.png'],
-        'fanart': ['channels', 'uk', 'really_fanart.jpg'],
-        'module': 'resources.lib.channels.uk.uktvplay'
-    },
-    'drama': {
-        'callback': 'replay_bridge',
-        'thumb': ['channels', 'uk', 'drama.png'],
-        'fanart': ['channels', 'uk', 'drama_fanart.jpg'],
-        'module': 'resources.lib.channels.uk.uktvplay'
-    },
-    'yesterday': {
-        'callback': 'replay_bridge',
-        'thumb': ['channels', 'uk', 'yesterday.png'],
-        'fanart': ['channels', 'uk', 'yesterday_fanart.jpg'],
+        'thumb': ['channels', 'uk', 'uktvplay.png'],
+        'fanart': ['channels', 'uk', 'uktvplay_fanart.jpg'],
         'module': 'resources.lib.channels.uk.uktvplay'
     }
 }

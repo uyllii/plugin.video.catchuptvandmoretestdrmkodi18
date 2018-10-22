@@ -315,6 +315,7 @@ LABELS = {
     'hearttv': 'Heart TV',
     'questred': 'Quest RED',
     'questtv': 'Quest TV',
+    'uktvplay': 'UKTV Play',
 
     # International channels / live TV
     'tv5mondeafrique': 'TV5Monde Afrique',

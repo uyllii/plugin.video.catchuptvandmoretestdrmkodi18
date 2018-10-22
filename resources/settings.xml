@@ -70,17 +70,24 @@
             <setting label="Quest Red" type="bool" id="questred" default="true" visible="eq(-5,true)"/>
             <setting label="" type="number" visible="false" id="questred.order" default="3"/>
 
-            <setting label="Dave" type="bool" id="dave" default="true" visible="eq(-7,true)"/>
+            <!-- REMOVE CHANNEL - CONFIGURATION TO KEEP ORDER -->
+            <setting label="Dave" type="bool" id="dave" default="false" visible="false"/>
             <setting label="" type="number" visible="false" id="dave.order" default="4"/>
 
-            <setting label="Really" type="bool" id="really" default="true" visible="eq(-9,true)"/>
+            <!-- REMOVE CHANNEL - CONFIGURATION TO KEEP ORDER -->
+            <setting label="Really" type="bool" id="really" default="false" visible="false"/>
             <setting label="" type="number" visible="false" id="really.order" default="5"/>
 
-            <setting label="Yesterday" type="bool" id="yesterday" default="true" visible="eq(-11,true)"/>
+            <!-- REMOVE CHANNEL - CONFIGURATION TO KEEP ORDER -->
+            <setting label="Yesterday" type="bool" id="yesterday" default="false" visible="false"/>
             <setting label="" type="number" visible="false" id="yesterday.order" default="6"/>
 
-            <setting label="Drama" type="bool" id="drama" default="true" visible="eq(-13,true)"/>
+            <!-- REMOVE CHANNEL - CONFIGURATION TO KEEP ORDER -->
+            <setting label="Drama" type="bool" id="drama" default="false" visible="false"/>
             <setting label="" type="number" visible="false" id="drama.order" default="7"/>
+
+            <setting label="UKTV Play" type="bool" id="uktvplay" default="true" visible="eq(-15,true)"/>
+            <setting label="" type="number" visible="false" id="uktvplay.order" default="8"/>
         <!-- United Kingdom -->
 
         <!-- Belgium -->
