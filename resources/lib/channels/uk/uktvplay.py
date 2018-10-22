@@ -44,9 +44,6 @@ import urlquick
 
 URL_ROOT = 'https://uktvplay.uktv.co.uk'
 
-URL_SHOWS = URL_ROOT + '/shows/'
-# channel_name
-
 URL_BRIGHTCOVE_DATAS = 'https://s3-eu-west-1.amazonaws.com/uktv-static/prod/play/app.%s.js'
 # JS_id
 # https://s3-eu-west-1.amazonaws.com/uktv-static/prod/play/35639012dd82fd7809e9.js
@@ -174,11 +171,11 @@ def get_brightcove_policy_key(data_account, data_player):
 @Resolver.register
 def get_video_url(plugin, item_id, data_video_id, item_dict):
 
-    # resp = urlquick.get(URL_SHOWS)
-    # # Get data_account / data_player
-    # js_id = re.compile(
-    #     r'uktv\-static\/prod\/play\/app\.(.*?)\.js').findall(resp.text)[0]
-    resp2 = urlquick.get(URL_BRIGHTCOVE_DATAS % '35639012dd82fd7809e9') # Return 403 (need some account)
+    resp = urlquick.get(URL_ROOT)
+    # Get data_account / data_player
+    js_id = re.compile(
+        r'uktv\-static\/prod\/play\/(.*?)\.js').findall(resp.text)[0]
+    resp2 = urlquick.get(URL_BRIGHTCOVE_DATAS % js_id) # Return 403 (need some account)
     data_account = re.compile(
         r'VUE_APP_BRIGHTCOVE_ACCOUNT\:\"(.*?)\"').findall(resp2.text)[0]
     data_player = re.compile(
