@@ -45,7 +45,7 @@ import urlquick
 
 URL_ROOT = 'https://uktvplay.uktv.co.uk'
 
-URL_BRIGHTCOVE_DATAS = 'https://s3-eu-west-1.amazonaws.com/uktv-static/prod/play/app.%s.js'
+URL_BRIGHTCOVE_DATAS = 'https://s3-eu-west-1.amazonaws.com/uktv-static/prod/play/%s.js'
 # JS_id
 # https://s3-eu-west-1.amazonaws.com/uktv-static/prod/play/35639012dd82fd7809e9.js
 
@@ -119,7 +119,9 @@ def list_programs(plugin, item_id, letter_value):
 
     for program_datas in json_parser:
         program_title = program_datas['name']
-        program_image = program_datas['image']
+        program_image = ''
+        if 'image' in program_datas:
+            program_image = program_datas['image']
         program_slug = program_datas['slug']
 
         item = Listitem()
@@ -190,20 +192,26 @@ def get_brightcove_policy_key(data_account, data_player):
 @Resolver.register
 def get_video_url(plugin, item_id, data_video_id, item_dict):
 
-    resp = urlquick.get(URL_ROOT)
+    # create session request
+    session_requests = requests.session()
+
     # Get data_account / data_player
-    js_id = re.compile(
-        r'uktv\-static\/prod\/play\/(.*?)\.js').findall(resp.text)[0]
-    resp2 = urlquick.get(URL_BRIGHTCOVE_DATAS % js_id) # Return 403 (need some account)
-    data_account = re.compile(
-        r'VUE_APP_BRIGHTCOVE_ACCOUNT\:\"(.*?)\"').findall(resp2.text)[0]
-    data_player = re.compile(
-        r'VUE_APP_BRIGHTCOVE_PLAYER\:\"(.*?)\"').findall(resp2.text)[0]
+    resp = session_requests.get(URL_ROOT)
+    js_id_all = re.compile(
+        r'uktv\-static\/prod\/play\/(.*?)\.js').findall(resp.text)
+    for js_id in js_id_all:
+        resp2 = session_requests.get(URL_BRIGHTCOVE_DATAS % js_id)
+        if len(re.compile(r'VUE_APP_BRIGHTCOVE_ACCOUNT\:\"(.*?)\"').findall(resp2.text)) > 0:
+            data_account = re.compile(
+                r'VUE_APP_BRIGHTCOVE_ACCOUNT\:\"(.*?)\"').findall(resp2.text)[0]
+            data_player = re.compile(
+                r'VUE_APP_BRIGHTCOVE_PLAYER\:\"(.*?)\"').findall(resp2.text)[0]
+            break
 
     # Method to get JSON from 'edge.api.brightcove.com'
-    resp3 = urlquick.get(
+    resp3 = session_requests.get(
         URL_BRIGHTCOVE_VIDEO_JSON % (data_account, data_video_id),
-        headers={'User-Agent': web_utils.get_random_ua, 
+        headers={'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.67 Safari/537.36', 
             'Accept': 'application/json;pk=%s' % (get_brightcove_policy_key(data_account, data_player))})
 
     json_parser = json.loads(resp3.text)

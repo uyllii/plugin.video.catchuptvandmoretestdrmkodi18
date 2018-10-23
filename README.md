@@ -14,10 +14,7 @@ Cette extension regroupe l'ensemble des vidéos des différents services et cha�
 - Quest OD *(Replay) (DRM capabilities)*
 - Quest TV *(Live TV) (DRM capabilities)*
 - Quest RED *(Live TV) (DRM capabilities)*
-- Dave *(Replay) (DRM capabilities)*
-- Really *(Replay) (DRM capabilities)*
-- Drama *(Replay) (DRM capabilities)*
-- Yesterday *(Replay) (DRM capabilities)*
+- UKTV Play *(Replay) (DRM capabilities)*
 
 ### Belgique — *Belgium*
 ##### TV Communauté française — *French Community TV*
