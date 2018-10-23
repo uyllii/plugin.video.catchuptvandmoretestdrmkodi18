@@ -229,6 +229,13 @@
             <setting label="30246" type="text" id="rtlplaybe.login" visible="eq(-1,true)" defaut=""/>
             <setting label="30247" type="text" id="rtlplaybe.password" option="hidden" visible="eq(-2,true)" defaut=""/>
 
+        <setting label="30084" type="lsep" subsetting="true" visible="eq(1,true)"/>
+        <setting label="" type="bool" id="uk" default="true" visible="false"/>
+
+            <setting label="30248" type="text" id="uktvplay.login" visible="eq(-1,true)" defaut=""/>
+            <setting label="30249" type="text" id="uktvplay.password" option="hidden" visible="eq(-2,true)" defaut=""/>
+
+
     </category>
     <!-- Accounts -->
 

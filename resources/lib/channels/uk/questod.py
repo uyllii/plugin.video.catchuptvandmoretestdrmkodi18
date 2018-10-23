@@ -20,11 +20,14 @@
     Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
+# The unicode_literals import only has
+# an effect on Python 2.
+# It makes string literals as unicode like in Python 3
 from __future__ import unicode_literals
 
 from codequick import Route, Resolver, Listitem, utils, Script
 
-from resources.lib.labels import *
+from resources.lib.labels import LABELS
 from resources.lib import web_utils
 import resources.lib.cq_utils as cqu
 
@@ -103,6 +106,7 @@ def list_categories(plugin, item_id):
             category_name_value=category_name_value
         )
         yield item
+
 
 @Route.register
 def list_programs_mode(plugin, item_id, category_name_value):
@@ -209,6 +213,7 @@ def list_videos(plugin, item_id, program_id, program_season_number):
                 )
                 yield item
 
+
 @Resolver.register
 def get_video_url(plugin, item_id, video_id, item_dict):
 
@@ -244,8 +249,10 @@ def get_video_url(plugin, item_id, video_id, item_dict):
     else:
         return json_parser["playback"]["streamUrlHls"]
 
+
 def live_entry(plugin, item_id, item_dict):
     return get_live_url(plugin, item_id, item_id.upper(), item_dict)
+
 
 @Resolver.register
 def get_live_url(plugin, item_id, video_id, item_dict):
@@ -270,9 +277,9 @@ def get_live_url(plugin, item_id, video_id, item_dict):
 
             item = Listitem()
             item.path = live_url
-            item.label = item_dict['label']
-            item.info.update(item_dict['info'])
-            item.art.update(item_dict['art'])
+            item.label = LABELS[item_id]
+            # item.info.update(item_dict['info'])
+            # item.art.update(item_dict['art'])
             item.property['inputstreamaddon'] = 'inputstream.adaptive'
             item.property['inputstream.adaptive.manifest_type'] = 'mpd'
             item.property['inputstream.adaptive.license_type'] = 'com.widevine.alpha'

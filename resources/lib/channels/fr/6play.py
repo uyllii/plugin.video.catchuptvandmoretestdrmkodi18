@@ -28,7 +28,7 @@ from __future__ import unicode_literals
 
 from codequick import Route, Resolver, Listitem, utils, Script
 
-from resources.lib.labels import *
+from resources.lib.labels import LABELS
 from resources.lib import web_utils
 import resources.lib.cq_utils as cqu
 
@@ -142,6 +142,7 @@ def list_categories(plugin, item_id):
         )
         yield item
 
+
 @Route.register
 def list_programs(plugin, item_id, category_id):
     """
@@ -178,6 +179,7 @@ def list_programs(plugin, item_id, category_id):
             program_id=program_id
         )
         yield item
+
 
 @Route.register
 def list_program_categories(plugin, item_id, program_id):

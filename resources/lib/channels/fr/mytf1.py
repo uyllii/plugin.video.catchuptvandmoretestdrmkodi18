@@ -28,7 +28,7 @@ from __future__ import unicode_literals
 
 from codequick import Route, Resolver, Listitem, utils, Script
 
-from resources.lib.labels import *
+from resources.lib.labels import LABELS
 from resources.lib import web_utils
 import resources.lib.cq_utils as cqu
 

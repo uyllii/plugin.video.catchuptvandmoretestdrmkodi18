@@ -27,7 +27,7 @@ from __future__ import unicode_literals
 
 from codequick import Route, Resolver, Listitem, utils, Script
 
-from resources.lib.labels import *
+from resources.lib.labels import LABELS
 from resources.lib import web_utils
 from resources.lib import resolver_proxy
 import resources.lib.cq_utils as cqu
@@ -35,6 +35,7 @@ import resources.lib.cq_utils as cqu
 
 import json
 import re
+import requests
 import urlquick
 
 
@@ -67,6 +68,24 @@ URL_INFO_PROGRAM = URL_API + '/vod/brand/?slug=%s'
 
 URL_VIDEOS = URL_API + '/vod/series/?id=%s'
 # Serie_ID
+
+URL_LOGIN_AUTHENTICATE = 'https://live.mppglobal.com/api/accounts/authenticate'
+
+# headers
+# Provisional headers are shown
+# Accept: application/json, text/plain, */*
+# Content-Type: application/json;charset=UTF-8
+# Origin: https://uktvplay.uktv.co.uk
+# Referer: https://uktvplay.uktv.co.uk/account/?returnToMainSitePath=/
+# User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.67 Safari/537.36
+# X-TokenId: 11372E1C67F3435CB12646D2051DE628
+# X-Version: 9.0.0
+# payload
+# {email: "*****", password: "*******"}
+# email: "*********"
+# password: "************"
+
+URL_TOKEN_LOGIN = 'https://uktvplay.uktv.co.uk/account/static/js/settings/settings.js'
 
 def replay_entry(plugin, item_id):
     """

@@ -322,6 +322,14 @@ msgctxt "#30247"
 msgid "RTLplay Password"
 msgstr "Mot de passe RTLplay"
 
+msgctxt "#30248"
+msgid "UKTV Play Login"
+msgstr "Login UKTV Play"
+
+msgctxt "#30249"
+msgid "UKTV Play Password"
+msgstr "Mot de passe UKTV Play"
+
 # Reserved space for other tab/category in settins (from 30260 to 30339)
 
 
