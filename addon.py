@@ -183,7 +183,7 @@ def generic_menu(plugin, menu_id, item_module=None, item_dict=None):
 
 
 @Route.register
-def tv_guide_menu(plugin, menu_id, item_module=None):
+def tv_guide_menu(plugin, menu_id, item_module=None, item_dict=None):
 
     # TEMPO (waiting for the CodeQuick update)
     plugin.cache_to_disc = True

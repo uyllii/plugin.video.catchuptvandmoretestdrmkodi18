@@ -47,7 +47,6 @@ import xbmcgui
 DESIRED_QUALITY = Script.setting['quality']
 
 URL_DAILYMOTION_EMBED = 'http://www.dailymotion.com/embed/video/%s'
-URL_DAILYMOTION_EMBED_2 = 'https://www.dailymotion.com/player/metadata/video/%s?integration=inline&GK_PV5_NEON=1'
 # Video_id
 
 URL_VIMEO_BY_ID = 'https://player.vimeo.com/video/%s?byline=0&portrait=0&autoplay=1'
@@ -100,66 +99,8 @@ def get_stream_kaltura(
 # DailyMotion Part
 def get_stream_dailymotion(
         plugin, video_id, download_mode=False, video_label=None):
-
-    # url_dmotion = URL_DAILYMOTION_EMBED % (video_id)
-    # Just now YBDL seems to not be able to deals with Dailymotion URL :-/
-    # So we keep to legacy method below
-    # return get_stream_default(plugin, url_dmotion, download_mode)
-
-    url_dmotion = URL_DAILYMOTION_EMBED_2 % (video_id)
-
-    if download_mode:
-        return download.download_video(url_dmotion, video_label)
-
-    dmotion_json = urlquick.get(url_dmotion)
-    dmotion_jsonparser = json.loads(dmotion_json.text)
-    all_datas_videos_quality = []
-    all_datas_videos_path = []
-    if "qualities" not in dmotion_jsonparser:
-        plugin.notify('ERROR', plugin.localize(30716))
-        return False
-    if "auto" in dmotion_jsonparser["qualities"]:
-        all_datas_videos_quality.append('auto')
-        all_datas_videos_path.append(dmotion_jsonparser["qualities"]["auto"][0]["url"])
-    if "144" in dmotion_jsonparser["qualities"]:
-        all_datas_videos_quality.append('144')
-        all_datas_videos_path.append(dmotion_jsonparser["qualities"]["144"][1]["url"])
-    if "240" in dmotion_jsonparser["qualities"]:
-        all_datas_videos_quality.append('240')
-        all_datas_videos_path.append(dmotion_jsonparser["qualities"]["240"][1]["url"])
-    if "380" in dmotion_jsonparser["qualities"]:
-        all_datas_videos_quality.append('380')
-        all_datas_videos_path.append(dmotion_jsonparser["qualities"]["380"][1]["url"])
-    if "480" in dmotion_jsonparser["qualities"]:
-        all_datas_videos_quality.append('480')
-        all_datas_videos_path.append(dmotion_jsonparser["qualities"]["480"][1]["url"])
-    if "720" in dmotion_jsonparser["qualities"]:
-        all_datas_videos_quality.append('720')
-        all_datas_videos_path.append(dmotion_jsonparser["qualities"]["720"][1]["url"])
-    if "1080" in dmotion_jsonparser["qualities"]:
-        all_datas_videos_quality.append('1080')
-        all_datas_videos_path.append(dmotion_jsonparser["qualities"]["1080"][1]["url"])
-
-    if DESIRED_QUALITY == "DIALOG":
-        selected_item = xbmcgui.Dialog().select(
-            plugin.localize(LABELS['choose_video_quality']),
-            all_datas_videos_quality)
-        if selected_item > -1:
-            return all_datas_videos_path[selected_item]
-        else:
-            return False
-
-    elif DESIRED_QUALITY == 'BEST':
-        url_stream = ''
-        for video_path in all_datas_videos_path:
-            url_stream = video_path
-        return url_stream
-
-    else:
-        if len(all_datas_videos_path) == 1:
-            return all_datas_videos_path[0]
-        else:
-            return all_datas_videos_path[1]
+    url_dailymotion = URL_DAILYMOTION_EMBED % video_id
+    return get_stream_default(plugin, url_dailymotion, download_mode, video_label)
 
 
 # Vimeo Part
