@@ -34,4 +34,3 @@ def get_item_media_path(item_media_path):
     full_path = os.path.join(
         Script.get_info("path"), "resources", "media", *(item_media_path))
     return ensure_native_str(full_path)
-
