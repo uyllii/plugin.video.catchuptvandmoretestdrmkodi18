@@ -361,9 +361,10 @@ def get_video_url(plugin, item_id, video_id, item_dict):
         return False
 
     subtitle_url = ''
-    for asset in video_assets:
-        if 'subtitle_vtt' in asset["type"]:
-            subtitle_url = asset['full_physical_path']
+    if plugin.setting.get_boolean('active_subtitle'):
+        for asset in video_assets:
+            if 'subtitle_vtt' in asset["type"]:
+                subtitle_url = asset['full_physical_path']
 
     for asset in video_assets:
         if 'usp_dashcenc_h264' in asset["type"]:
@@ -413,9 +414,10 @@ def get_live_url(plugin, item_id, video_id, item_dict):
             return False
 
         subtitle_url = ''
-        for asset in video_assets:
-            if 'subtitle_vtt' in asset["type"]:
-                subtitle_url = asset['full_physical_path']
+        if plugin.setting.get_boolean('active_subtitle'):
+            for asset in video_assets:
+                if 'subtitle_vtt' in asset["type"]:
+                    subtitle_url = asset['full_physical_path']
 
         for asset in video_assets:
             if 'delta_hls_h264' in asset["type"]:
@@ -511,9 +513,10 @@ def get_live_url(plugin, item_id, video_id, item_dict):
             return False
 
         subtitle_url = ''
-        for asset in video_assets:
-            if 'subtitle_vtt' in asset["type"]:
-                subtitle_url = asset['full_physical_path']
+        if plugin.setting.get_boolean('active_subtitle'):
+            for asset in video_assets:
+                if 'subtitle_vtt' in asset["type"]:
+                    subtitle_url = asset['full_physical_path']
 
         for asset in video_assets:
             if 'delta_dashcenc_h264' in asset["type"]:

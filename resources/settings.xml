@@ -194,6 +194,9 @@
             <!-- TV Guide -->
             <setting label="30168" type="bool" id="tv_guide" default="true"/>
 
+            <!-- Subtitle -->
+            <setting label="30169" type="bool" id="active_subtitle" default="false"/>
+
 
     </category>
     <!-- Quality and Content -->
