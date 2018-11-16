@@ -46,10 +46,6 @@ ROOT = {
     'replay': {
         'callback': 'generic_menu',
         'thumb': ['replay.png']
-    },
-    'websites': {
-        'callback': 'generic_menu',
-        'thumb': ['websites.png']
     }
 }
 
@@ -210,6 +206,18 @@ FR_REPLAY = {
         'thumb': ['channels', 'fr', 'fun_radio.png'],
         'fanart': ['channels', 'fr', 'fun_radio_fanart.jpg'],
         'module': 'resources.lib.channels.fr.6play'
+    },
+    'c8': {
+        'callback': 'replay_bridge',
+        'thumb': ['channels', 'fr', 'c8.png'],
+        'fanart': ['channels', 'fr', 'c8_fanart.jpg'],
+        'module': 'resources.lib.channels.fr.mycanal'
+    },
+    'canalplus': {
+        'callback': 'replay_bridge',
+        'thumb': ['channels', 'fr', 'canalplus.png'],
+        'fanart': ['channels', 'fr', 'canalplus_fanart.jpg'],
+        'module': 'resources.lib.channels.fr.mycanal'
     }
 }
 

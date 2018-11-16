@@ -38,6 +38,7 @@
 [improvements] Add TV Guid (FR)
 [DRM] Add UKTVPlay channels (UK)
 [Improvements] Add settings to activate subtitle if present in the content (desactivate by default)
+[DRM] Add mycanal channels (FR)
     </news>
     <assets>
       <icon>icon.png</icon>

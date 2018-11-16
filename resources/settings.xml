@@ -159,6 +159,12 @@
 
             <setting label="M6 Boutique" type="bool" id="mb" default="true" visible="eq(-25,true)"/>
             <setting label="" type="number" visible="false" id="mb.order" default="13"/>
+
+            <setting label="C8" type="bool" id="c8" default="true" visible="eq(-27,true)"/>
+            <setting label="" type="number" visible="false" id="c8.order" default="14"/>
+
+            <setting label="Canal+" type="bool" id="canalplus" default="true" visible="eq(-29,true)"/>
+            <setting label="" type="number" visible="false" id="canalplus.order" default="15"/>
         <!-- France -->
 
     </category>
