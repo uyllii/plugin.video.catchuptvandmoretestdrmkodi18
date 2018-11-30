@@ -33,6 +33,7 @@ from resources.lib import resolver_proxy
 import resources.lib.cq_utils as cqu
 
 
+import inputstreamhelper
 import json
 import re
 import requests
@@ -174,6 +175,10 @@ def get_brightcove_policy_key(data_account, data_player):
 
 @Resolver.register
 def get_video_url(plugin, item_id, data_video_id, item_dict):
+
+    is_helper = inputstreamhelper.Helper('mpd', drm='widevine')
+    if not is_helper.check_inputstream():
+        return False
 
     # create session request
     session_requests = requests.session()
