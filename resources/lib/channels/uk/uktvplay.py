@@ -26,19 +26,14 @@
 from __future__ import unicode_literals
 
 from codequick import Route, Resolver, Listitem, utils, Script
-
-from resources.lib.labels import LABELS
-from resources.lib import web_utils
-from resources.lib import resolver_proxy
+from resources.lib import common
 import resources.lib.cq_utils as cqu
-
 
 import inputstreamhelper
 import json
 import re
 import requests
 import urlquick
-
 
 # TO DO
 # Replay protected by SAMPLE-AES (keep code - desactivate channel for the moment)
@@ -70,12 +65,20 @@ URL_INFO_PROGRAM = URL_API + '/vod/brand/?slug=%s'
 URL_VIDEOS = URL_API + '/vod/series/?id=%s'
 # Serie_ID
 
+# NOTE: altered listing; Category > SubCategory > Program > Season > Episode
+URL_CATEGORIES = URL_API + '/vod/categories'
+URL_SUBCATEGORIES = URL_API + '/vod/category/?slug=%s'
+URL_SUBCATEGORY_PROGRAMS = URL_API + '/vod/subcategory_brands/?slug=%s&size=999&is_watchable=True'
+
+# TODO: alternative listing; Channel > Program > Season > Episode
+# URL_CHANNELS = URL_API + '/vod/channel_list'
+
 
 def replay_entry(plugin, item_id):
     """
     First executed function after replay_bridge
     """
-    return list_letters(plugin, item_id)
+    return list_categories(plugin, item_id)  # use category listing until view selection enabled
 
 
 @Route.register
@@ -111,6 +114,75 @@ def list_programs(plugin, item_id, letter_value):
         item = Listitem()
         item.label = program_title
         item.art['thumb'] = program_image
+        item.art['fanart'] = program_image
+        item.set_callback(
+            list_seasons,
+            item_id=item_id,
+            program_slug=program_slug)
+        yield item
+
+
+@Route.register
+def list_categories(plugin, item_id):
+
+    resp = urlquick.get(URL_CATEGORIES)
+    json_parser = json.loads(resp.text)
+
+    for data in json_parser['categories']:
+        program_title = data['name']
+        program_image = ''
+        category_slug = data['slug']
+
+        item = Listitem()
+        item.label = program_title
+        item.art['thumb'] = common.get_item_media_path(['channels', 'uk', 'uktvplay.png'])
+        item.art['fanart'] = common.get_item_media_path(['channels', 'uk', 'uktv-background.jpg'])
+        item.set_callback(
+            list_subcategories,
+            item_id=item_id,
+            category_slug=category_slug)
+        yield item
+
+
+@Route.register
+def list_subcategories(plugin, item_id, category_slug):
+
+    resp = urlquick.get(URL_SUBCATEGORIES % category_slug)
+    json_parser = json.loads(resp.text)
+
+    for data in json_parser['subcategories']:
+        program_title = data['name']
+        program_image = ''
+        subcategory_slug = data['slug']
+
+        item = Listitem()
+        item.label = program_title
+        item.art['thumb'] = data['portrait_image']
+        item.art['fanart'] = data['hero_image']
+        item.set_callback(
+            list_subcategory_programs,
+            item_id=item_id,
+            subcategory_slug=subcategory_slug)
+        yield item
+
+
+@Route.register
+def list_subcategory_programs(plugin, item_id, subcategory_slug):
+
+    resp = urlquick.get(URL_SUBCATEGORY_PROGRAMS % subcategory_slug)
+    json_parser = json.loads(resp.text)
+
+    for data in json_parser['brand_list']:
+        program_title = data['name']
+        program_slug = data['slug']
+        program_image = ''
+        if 'image' in data:
+            program_image = data['image']
+
+        item = Listitem()
+        item.label = program_title
+        item.art['thumb'] = program_image
+        item.art['fanart'] = program_image
         item.set_callback(
             list_seasons,
             item_id=item_id,
@@ -120,16 +192,19 @@ def list_programs(plugin, item_id, letter_value):
 
 @Route.register
 def list_seasons(plugin, item_id, program_slug):
-
     resp = urlquick.get(URL_INFO_PROGRAM % program_slug)
     json_parser = json.loads(resp.text)
 
-    for season_datas in json_parser["series"]:
+    for season_datas in sorted(json_parser["series"], key=lambda season: season['number']):
         season_title = 'Season - ' + season_datas['number']
         serie_id = season_datas["id"]
-
+        program_image = ''
+        if 'image' in json_parser:
+            program_image = json_parser['image']
         item = Listitem()
         item.label = season_title
+        item.art['thumb'] = program_image
+        item.art['fanart'] = program_image
         item.set_callback(
             list_videos,
             item_id=item_id,
@@ -143,11 +218,13 @@ def list_videos(plugin, item_id, serie_id):
     resp = urlquick.get(URL_VIDEOS % serie_id)
     json_parser = json.loads(resp.text)
 
-    for video_datas in json_parser["episodes"]:
+    for video_datas in sorted(json_parser["episodes"], key=lambda episode: episode['episode_number']):
                  
         video_title = video_datas["brand_name"] + \
-            ' - ' ' S%sE%s' % (video_datas["series_number"], str(video_datas["episode_number"])) + ' - ' + video_datas["name"]
-        video_image = video_datas["image"]
+            ' - ' ' S%sE%s' % (video_datas["series_number"].zfill(2), str(video_datas["episode_number"]).zfill(2)) + ' - ' + video_datas["name"]
+        video_image = ''
+        if "image" in video_datas:
+            video_image = video_datas["image"]
         video_plot = video_datas["synopsis"]
         video_duration = video_datas["duration"] * 60
         video_id = video_datas["video_id"]
@@ -155,6 +232,7 @@ def list_videos(plugin, item_id, serie_id):
         item = Listitem()
         item.label = video_title
         item.art['thumb'] = video_image
+        item.art['fanart'] = video_image
         item.info['plot'] = video_plot
         item.info['duration'] = video_duration
         item.set_callback(
